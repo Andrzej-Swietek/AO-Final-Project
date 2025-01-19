@@ -1,12 +1,15 @@
 import time
 import redis
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-def process_image_in_background(content_image_path: str, difficulty: str, task_id: str):
+
+
+def process_image_in_background(content_image_path: str, difficulty: str, task_id: str, logger, redis_client):
     try:
-        # Set up Redis client
-        redis_client = redis.Redis(host='redis', port=6379, db=0)
-
+        from ..color_segmentation import ImageColorSegmentation
         colorSegmentation = ImageColorSegmentation(task_id)
         colorSegmentation.load_image(content_image_path)
         colorSegmentation.process()
@@ -21,6 +24,6 @@ def process_image_in_background(content_image_path: str, difficulty: str, task_i
     except Exception as e:
         redis_client.set(task_id, 'Failed')
         logger.error(f"Task {task_id} failed with error: {e}")
-     finally:
+    finally:
         if redis_client:
             redis_client.close()

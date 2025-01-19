@@ -38,7 +38,7 @@ export const UploadPage = () => {
 
         // Polling status
         const interval = setInterval(async () => {
-          const statusResponse = await fetch(`${PUBLIC_API_URL}/api/status/${task_id}`);
+          const statusResponse = await fetch(`${PUBLIC_API_URL}/api/task_status/${task_id}`);
           const statusData = await statusResponse.json();
 
           if (statusData.status === "Completed") {

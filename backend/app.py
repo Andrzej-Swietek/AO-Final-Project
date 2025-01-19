@@ -1,12 +1,17 @@
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, request, send_file
 from flask_cors import CORS, cross_origin
 from uuid import uuid4
 import redis
 import os
+import sys
 import logging
 from rq import Queue
 
-from utils import send_file_with_attachment, encode_image
+from .utils import send_file_with_attachment, encode_image
+from .worker import process_image_in_background
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 app = Flask(__name__, static_folder="static")
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000  # 16MB
@@ -42,13 +47,13 @@ def hello():
 @app.route("/api/process", methods=["POST"])
 @cross_origin()
 def process_image():
-    content_image = request.files['image']
-    difficulty = request.form.get('difficulty')
-
-    if not content_image or not style_image:
-        return jsonify({'error': 'Image is required required'}), 400
-
     try:
+        content_image = request.files['image']
+        difficulty = request.form.get('difficulty', 50)
+        logger.info(content_image)
+        if not content_image:
+            return jsonify({'error': 'Image is required'}), 400
+
         task_id = str(uuid4())  
 
         task_folder = os.path.join(OUTPUT_FOLDER, task_id)
@@ -56,9 +61,11 @@ def process_image():
 
         image_path = os.path.join(task_folder, content_image.filename)
         content_image.save(image_path)
-
+        if not redis_client:
+            return jsonify({ "status": "no redis" }),500
         redis_client.set(task_id, 'In Progress') 
-        job = queue.enqueue(process_image_in_background, content_image, difficulty, task_id)
+        # job = queue.enqueue(process_image_in_background, content_image, difficulty, task_id)
+        process_image_in_background(image_path, difficulty, task_id, logger, redis_client)
         logger.info(f"Task {task_id} started.")
          
         return jsonify({ "status": "processing", "task_id": task_id })
