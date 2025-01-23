@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import logging
@@ -7,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ImageColorSegmentation:
-    OUTPUT_FOLDER: str = "../output"
+    OUTPUT_FOLDER: str = "./output"
     scale = 255 / 360
 
     def __init__(self, task_id: str):
@@ -64,5 +66,18 @@ class ImageColorSegmentation:
 
         self.save_image("final_colored_image.jpg", final_colored_image)
 
+    # def save_image(self, name: str, image) -> None:
+    #     cv2.imwrite(f"{self.OUTPUT_FOLDER}/{name}", image)
     def save_image(self, name: str, image) -> None:
-        cv2.imwrite(f"{self.OUTPUT_FOLDER}/{name}", image)
+        output_path = os.path.join(self.OUTPUT_FOLDER, self.task_id, name)
+        try:
+            if not os.path.exists(self.OUTPUT_FOLDER):
+                os.makedirs(self.OUTPUT_FOLDER, exist_ok=True)
+
+            success = cv2.imwrite(output_path, image)
+            if success:
+                logger.info(f"Image saved successfully: {output_path}")
+            else:
+                logger.error(f"Failed to save image: {output_path}")
+        except Exception as e:
+            logger.error(f"Error while saving image {output_path}: {e}")
