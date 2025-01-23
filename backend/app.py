@@ -1,28 +1,27 @@
-from flask import Flask, send_from_directory, jsonify, request, send_file
+from flask import Flask, send_from_directory, jsonify, request, Response
 from flask_cors import CORS, cross_origin
 from uuid import uuid4
 import redis
 import os
 import sys
+import json
+import time
 import logging
 from rq import Queue
 
 from .utils import send_file_with_attachment, encode_image
-from .worker import process_image_in_background
+from .worker.image_worker import process_image_in_background
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 
 app = Flask(__name__, static_folder="static")
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000  # 16MB
 CORS(app)
 OUTPUT_FOLDER = "./output/"
 
-
 # Set up redis
 redis_client = redis.Redis(host='redis', port=6379, db=0)
 queue = Queue(connection=redis_client)
-
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -65,16 +64,13 @@ def process_image():
             return jsonify({ "status": "no redis" }),500
         redis_client.set(task_id, 'In Progress') 
         # job = queue.enqueue(process_image_in_background, content_image, difficulty, task_id)
-        process_image_in_background(image_path, difficulty, task_id, logger, redis_client)
         logger.info(f"Task {task_id} started.")
-         
-        return jsonify({ "status": "processing", "task_id": task_id })
+        process_image_in_background(image_path, difficulty, task_id, logger, redis_client)
+
+        return jsonify({"status": "processing", "task_id": task_id})
     except Exception as e:
         logger.error(f"Error processing image: {e}")
         return jsonify({'error': 'Failed to process image'}), 500
-
-
-
 
 
 @app.route('/api/task_status/<task_id>', methods=['GET'])
@@ -86,16 +82,15 @@ def task_status(task_id):
     return jsonify({'task_id': task_id, 'status': status.decode('utf-8')})
 
 
-
 @app.route('/api/download/<task_id>', methods=['GET'])
 @cross_origin()
 def download(task_id):
     task = redis_client.get(task_id)
-    task_status = task.decode('utf-8')
+    task_status_str = task.decode('utf-8')
     if task is None:
         return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
 
-    if task_status in ['Finished', 'Completed']:
+    if task_status_str in ['Finished', 'Completed']:
         output_path = f"../output/{task_id}/result.jpg"
         if os.path.exists(output_path):
             return send_file_with_attachment(output_path, 'result.jpg')
@@ -105,8 +100,7 @@ def download(task_id):
                 'status': 'Output file not found'
             }), 404
     else:
-        return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status}]'}), 404
-
+        return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
 
 
 @app.route("/api/task_status_stream/<task_id>", methods=["GET"])
@@ -126,6 +120,7 @@ def task_status_stream(task_id):
             time.sleep(1)
 
     return Response(generate(), content_type='text/event-stream')
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
