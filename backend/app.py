@@ -104,9 +104,9 @@ def download(task_id):
         return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
 
 
-@app.route('/api/download-filled-image/<task_id>', methods=['GET'])
+@app.route('/api/filled-image/<task_id>', methods=['GET'])
 @cross_origin()
-def download(task_id):
+def download_filled_image(task_id):
     task = redis_client.get(task_id)
     task_status_str = task.decode('utf-8')
     if task is None:
