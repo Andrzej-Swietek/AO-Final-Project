@@ -2,10 +2,9 @@ import unittest
 
 import cv2
 import numpy as np
-from skimage.morphology import thin
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
-    get_edges, combine_edges, combine_rgb_images, shrink_to_points, sharpen_image, find_inner_points_for_objects
+    get_edges, combine_edges, combine_rgb_images, find_inner_points_for_objects
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
