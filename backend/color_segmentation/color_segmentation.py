@@ -46,7 +46,7 @@ class ImageColorSegmentation:
             # 2. Znajdź punkt w każdym obiekcie
             object_points = find_inner_points_for_objects(mask)
             all_points.append(object_points)
-            cv2.imwrite("colored_mask" + str(i) + ".bmp", colored_mask)
+            self.save_image("colored_mask" + str(i) + ".bmp", colored_mask)
 
         combined_colored = combine_rgb_images(colored_masks)
         combined_edges = combine_edges(contours)

@@ -28,8 +28,23 @@ export const UploadPage = () => {
 
   const download = async () => {
     const response = await fetch(`${PUBLIC_API_URL}/api/download/${taskId}`);
-    const data: object = await response.json();
-    console.log(data)
+
+
+    if (!response.ok) {
+      console.error('Error downloading file:', response.statusText);
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'result.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 
   const uploadImage = async () => {
@@ -110,69 +125,84 @@ export const UploadPage = () => {
             </p>
             <p className="max-w-[900px] text-muted-foreground md:text-xl font-bold">Status: {status}</p>
           </div>
-          <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
-            <div
-                className="flex flex-col col-span-2 items-center justify-center border-2 border-dashed border-black rounded-lg p-24 space-y-4">
-              <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-8 h-8 text-muted-foreground"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                <circle cx="9" cy="9" r="2"></circle>
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-              </svg>
-              <p className="text-sm text-muted-foreground mb-8">Upload Image</p>
-              <input
-                  className="flex h-10 mt-4 font-semibold rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
-                  placeholder="Upload image"
-                  accept="image/png, image/jpeg"
-                  type="file"
-                  onChange={handleFileChange}
-              />
-            </div>
-            {contentImageUrl && (
-                <div className="flex flex-col items-center justify-center gap-4 mt-8 col-span-2">
-                  <p className="text-muted-foreground md:text-xl">Image preview:</p>
-                  <img className="w-[300px] h-[300px] object-cover rounded-md" src={contentImageUrl} alt="Preview"/>
-                </div>
-            )}
-          </div>
+          {
+            status != 'Finished' ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
+                    <div
+                        className="flex flex-col col-span-2 items-center justify-center border-2 border-dashed border-black rounded-lg p-24 space-y-4">
+                      <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-8 h-8 text-muted-foreground"
+                      >
+                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                      </svg>
+                      <p className="text-sm text-muted-foreground mb-8">Upload Image</p>
+                      <input
+                          className="flex h-10 mt-4 font-semibold rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full"
+                          placeholder="Upload image"
+                          accept="image/png, image/jpeg"
+                          type="file"
+                          onChange={handleFileChange}
+                      />
+                    </div>
+                    {contentImageUrl && (
+                        <div className="flex flex-col items-center justify-center gap-4 mt-8 col-span-2">
+                          <p className="text-muted-foreground md:text-xl">Image preview:</p>
+                          <img className="w-[300px] h-[300px] object-cover rounded-md" src={contentImageUrl}
+                               alt="Preview"/>
+                        </div>
+                    )}
+                  </div>
+                </>
+            ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
+                    <img src={`http://localhost:5000/api/view/${taskId}`} alt={"Kolorowanka"}/>
+                    <img src={`http://localhost:5000/api/view/${taskId}/final-image`} alt={"Wypełniona"}/>
+                  </div>
+                </>
+            )
+          }
+
 
           {
-              status == 'Finished' ? (
-                  <>
-                    <button
-                        className="inline-flex text-xl items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-32 py-2 mt-16"
-                        type="button"
-                        onClick={() => download()}
-                    >
-                      Download
-                    </button>
-                    <button
-                        className="inline-flex text-xl items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-32 py-2 mt-16"
-                        type="button"
-                        onClick={()=> window.location.reload()}
-                    >
-                      Reset
-                    </button>
-                  </>
-              ) : (
+            status == 'Finished' ? (
+                <>
                   <button
                       className="inline-flex text-xl items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-32 py-2 mt-16"
                       type="button"
-                      onClick={uploadImage}
+                      onClick={() => download()}
                   >
-                    Process Image
+                    Download
                   </button>
-              )
+                  <button
+                      className="inline-flex text-xl items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-32 py-2 mt-16"
+                      type="button"
+                      onClick={() => window.location.reload()}
+                  >
+                    Reset
+                  </button>
+                </>
+            ) : (
+                <button
+                    className="inline-flex text-xl items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-32 py-2 mt-16"
+                    type="button"
+                    onClick={uploadImage}
+                >
+                  Process Image
+                </button>
+            )
           }
         </div>
 
