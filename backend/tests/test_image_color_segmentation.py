@@ -1,11 +1,11 @@
 import unittest
 
 import cv2
-import numpy as np
-from skimage.morphology import thin
+
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
-    get_edges, combine_edges, combine_rgb_images, shrink_to_points, sharpen_image, find_inner_points_for_objects
+    get_edges, combine_edges, combine_rgb_images, find_inner_points_for_objects, \
+    scale_image, put_text_with_center_at
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
@@ -23,6 +23,7 @@ class TestImageColorSegmentation(unittest.TestCase):
 
     def test_clustering(self):
         og_image = cv2.imread("../example_images/img_3.png")
+        og_image = scale_image(og_image)
 
         clustering_result = kmeans_image_segmentation(og_image, 8)
         raw_masks = get_color_masks(clustering_result)
@@ -49,14 +50,10 @@ class TestImageColorSegmentation(unittest.TestCase):
             # 4. Zaznacz punkty i ponumeruj
             for j, (r, c) in enumerate(object_points, start=1):
                 # Rysujemy kółko w punkcie (czerwone)
-                cv2.circle(vis, (c, r), radius=4, color=(0, 0, 255), thickness=-1)
+                # cv2.circle(vis, (c, r), radius=4, color=(0, 0, 255), thickness=-1)
 
                 # Dodajemy numer (niebieski), lekko przesunięty w prawo
-                cv2.putText(vis, str(i), (c, r),
-                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                            fontScale=0.3,
-                            color=(255, 0, 0),
-                            thickness=1)
+                put_text_with_center_at(vis, str(i), c, r)
 
             cv2.imwrite("vis" + str(i) + ".bmp", vis)
             cv2.imwrite("colored_mask" + str(i) + ".bmp", colored_mask)
@@ -75,6 +72,9 @@ class TestImageColorSegmentation(unittest.TestCase):
         cv2.imwrite("segmented.bmp", clustering_result.segmented_image)
 
     assert 1 == 1
+
+    def test_of_test(self):
+        assert 1 == 1
 
 
 

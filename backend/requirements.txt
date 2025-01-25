@@ -4,3 +4,4 @@ rq
 opencv-python-headless
 numpy
 redis
+scikit-image

@@ -6,43 +6,31 @@ import numpy as np
 import cv2 as cv
 import os
 
-from cv2 import reduce
-from fontTools.misc.cython import returns
-from numpy import ndarray, dtype, floating
-
-
 @dataclass
 class KMeansResult:
     segmented_image: np.ndarray[np.uint8]  # shape (H, W, 3)
     labels: np.ndarray[np.int32]  # shape (H*W,)
     centers: np.ndarray[np.uint8]  # shape (K, 3)
 
+
 def kmeans_image_segmentation(image: np.ndarray[np.uint8], k: int) -> KMeansResult:
 
-    # Reshape image to a 2D array of pixels (H*W, 3)
     pixels = image.reshape((-1, 3))
 
-    # Convert pixels to float32 for k-means
     pixels = np.float32(pixels)
 
-    # Define k-means criteria
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
 
-    # Apply k-means clustering
     _, labels, centers = cv.kmeans(
         pixels, k, None, criteria, 10, cv.KMEANS_RANDOM_CENTERS
     )
 
-    # Convert cluster centers back to uint8
     centers = np.uint8(centers)
 
-    # Map each pixel to its cluster center
     segmented_pixels = centers[labels.flatten()]
 
-    # Reshape the segmented pixels back to the original image shape
     segmented_image = segmented_pixels.reshape(image.shape)
 
-    # Return the result as a dataclass
     return KMeansResult(segmented_image=segmented_image, labels=labels, centers=centers)
 
 
@@ -142,3 +130,30 @@ def find_inner_points_for_objects(bin_image):
 
     return points
 
+def scale_image(og_image: np.ndarray, size: int = 256) -> np.ndarray:
+    original_height, original_width = og_image.shape[:2]
+
+    if original_width > original_height:
+        scale = size / original_width
+        new_width = size
+        new_height = int(original_height * scale)
+    else:
+        scale = size / original_height
+        new_height = size
+        new_width = int(original_width * scale)
+
+    resized_image = cv2.resize(og_image, (new_width, new_height))
+    return resized_image
+
+
+def put_text_with_center_at(image: np.ndarray, text: str, x: int, y: int):
+    text = str(text)
+    font_face = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.3
+    color = (255, 0, 0)
+    thickness = 1
+    (x, y) = (x, y)
+    (text_width, text_height), baseline = cv2.getTextSize(text, font_face, font_scale, thickness)
+    text_x = x - text_width // 2
+    text_y = y + text_height // 2
+    cv2.putText(image, text, (text_x, text_y), font_face, font_scale, color, thickness)
