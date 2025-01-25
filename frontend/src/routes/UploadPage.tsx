@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {useToast} from "@/hooks/use-toast.ts";
 
 type OperationStatus =
     'Finished'
@@ -13,6 +14,7 @@ export const UploadPage = () => {
   const [contentImageUrl, setContentImageUrl] = useState<string | null>(null);
   const [resultImages, setResultImages] = useState<string[]>([]);
   const [taskId, setTaskId] = useState<string>("");
+  const { toast } = useToast()
 
   const PUBLIC_API_URL = "http://localhost:5000";
 
@@ -32,7 +34,11 @@ export const UploadPage = () => {
 
   const uploadImage = async () => {
     if (!contentImage) {
-      alert("Please upload an image.");
+      // alert("Please upload an image.");
+      toast({
+        title: "Upload Error",
+        description: "Please provide an image"
+      })
       return;
     }
 
@@ -60,17 +66,33 @@ export const UploadPage = () => {
             setStatus("Finished");
             setResultImages([]);
             clearInterval(interval);
+            toast({
+              title: "Processing Successful",
+              description: "Please try again later",
+            })
           } else if (statusData.status === "Failed") {
             setStatus("Failed");
             clearInterval(interval);
+            toast({
+              title: "Processing Error",
+              description: "Please try again later",
+            })
           }
         }, 2000);
       } else {
         setStatus("Failed");
+        toast({
+          title: "Processing Error",
+          description: "Please try again later",
+        })
         console.error(data.error);
       }
     } catch (error) {
       setStatus("Failed");
+      toast({
+        title: "Processing Error",
+        description: "Please try again later",
+      })
       console.error("Error uploading the image:", error);
     }
   };

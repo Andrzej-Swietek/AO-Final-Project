@@ -1,6 +1,7 @@
 import os
 import sys
-from ..color_segmentation.color_segmentation import ImageColorSegmentation
+
+from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -9,7 +10,6 @@ def process_image_in_background(content_image_path: str, difficulty: str, task_i
     try:
         color_segmentation = ImageColorSegmentation(task_id)
         color_segmentation.load_image(content_image_path)
-        color_segmentation.process()
 
         logger.info(f"Processing image for task {task_id} with difficulty {difficulty}...")
 
