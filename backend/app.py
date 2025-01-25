@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, jsonify, request, Response
+from flask import Flask, send_from_directory, jsonify, request, Response, send_file
 from flask_cors import CORS, cross_origin
 from uuid import uuid4
 import redis
@@ -9,8 +9,8 @@ import time
 import logging
 from rq import Queue
 
-from .utils import send_file_with_attachment, encode_image
-from .worker.image_worker import process_image_in_background
+from backend.utils import send_file_with_attachment, encode_image
+from backend.worker.image_worker import process_image_in_background
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -20,7 +20,8 @@ CORS(app)
 OUTPUT_FOLDER = "./output/"
 
 # Set up redis
-redis_client = redis.Redis(host='redis', port=6379, db=0)
+redisHost = os.getenv("REDIS_HOST", "127.0.0.1")
+redis_client = redis.Redis(host=redisHost, port=6379, db=0)
 queue = Queue(connection=redis_client)
 
 # Setup logging
@@ -91,7 +92,57 @@ def download(task_id):
         return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
 
     if task_status_str in ['Finished', 'Completed']:
-        output_path = f"../output/{task_id}/result.jpg"
+        output_path = f"./output/{task_id}/result.jpg"
+        if os.path.exists(output_path):
+            return send_file_with_attachment(output_path, 'result.jpg')
+        else:
+            return jsonify({
+                'task_id': task_id,
+                'status': 'Output file not found'
+            }), 404
+    else:
+        return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
+
+@app.route('/api/view/<task_id>', methods=['GET'])
+@cross_origin()
+def view_image(task_id):
+    task = redis_client.get(task_id)
+    task_status_str = task.decode('utf-8') if task else None
+
+    if task is None or task_status_str not in ['Finished', 'Completed']:
+        return jsonify({'task_id': task_id, 'status': 'Image not available'}), 404
+
+    output_path = f"./output/{task_id}/result.jpg"
+    if os.path.exists(output_path):
+        return send_file(output_path, mimetype='image/jpeg')
+    else:
+        return jsonify({'task_id': task_id, 'status': 'Image file not found'}), 404
+
+@app.route('/api/view/<task_id>/final-image', methods=['GET'])
+@cross_origin()
+def view_final_image(task_id):
+    task = redis_client.get(task_id)
+    task_status_str = task.decode('utf-8') if task else None
+
+    if task is None or task_status_str not in ['Finished', 'Completed']:
+        return jsonify({'task_id': task_id, 'status': 'Image not available'}), 404
+
+    output_path = f"./output/{task_id}/final_image.bmp"
+    if os.path.exists(output_path):
+        return send_file(output_path, mimetype='image/jpeg')
+    else:
+        return jsonify({'task_id': task_id, 'status': 'Image file not found'}), 404
+
+@app.route('/api/filled-image/<task_id>', methods=['GET'])
+@cross_origin()
+def download_filled_image(task_id):
+    task = redis_client.get(task_id)
+    task_status_str = task.decode('utf-8')
+    if task is None:
+        return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
+
+    if task_status_str in ['Finished', 'Completed']:
+        output_path = f"./output/{task_id}/final_image.jpg"
         if os.path.exists(output_path):
             return send_file_with_attachment(output_path, 'result.jpg')
         else:

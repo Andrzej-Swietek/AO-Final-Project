@@ -1,8 +1,11 @@
+import logging
 import os
 
 import cv2
 import numpy as np
-import logging
+
+from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
+    get_edges, sharpen_image, scale_image, find_inner_points_for_objects, combine_rgb_images, combine_edges
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -12,62 +15,64 @@ class ImageColorSegmentation:
     OUTPUT_FOLDER: str = "./output"
     scale = 255 / 360
 
+
     def __init__(self, task_id: str):
         self.images = []
+        self.color_masks = []
         self.image = None
         self.task_id = task_id
-        self.hsl_to_cv2_scale = self.scale
-        self.color_ranges = np.array([
-            round(0 * self.hsl_to_cv2_scale),
-            round(20 * self.hsl_to_cv2_scale),
-            round(45 * self.hsl_to_cv2_scale),
-            round(65 * self.hsl_to_cv2_scale),
-            round(150 * self.hsl_to_cv2_scale),
-            round(185 * self.hsl_to_cv2_scale),
-            round(220 * self.hsl_to_cv2_scale),
-            round(250 * self.hsl_to_cv2_scale),
-            round(275 * self.hsl_to_cv2_scale),
-            round(325 * self.hsl_to_cv2_scale),
-            round(360 * self.hsl_to_cv2_scale)
-        ])
+
 
     def load_image(self, image_path: str) -> None:
         self.image = cv2.imread(image_path)
-        self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2HLS)
-        self.images = []
+        self.image = scale_image(self.image)
 
-        for i in range(1, self.color_ranges.size):
-            ranged_image = cv2.inRange(self.image, np.array([self.color_ranges[i - 1], 0, 0]),
-                                       np.array([self.color_ranges[i], 256, 256]))
-            self.images.append(ranged_image)
-            self.save_image(f"image{round(float(self.color_ranges[i] / self.hsl_to_cv2_scale))}.jpg", ranged_image)
+    def process_image(self):
+        clustering_result = kmeans_image_segmentation(self.image, 6)
+        raw_masks = get_color_masks(clustering_result)
+        contours = []
+        colored_masks = []
+        all_points = []
 
-    def process(self) -> None:
-        final_colored_image = np.zeros_like(self.image)
+        for i in range(len(raw_masks)):
+            mask = remove_distortions(raw_masks[i])
+            edges = get_edges(mask)
+            contours.append(edges)
+            colored_mask = mask.copy()
+            colored_mask = cv2.cvtColor(colored_mask, cv2.COLOR_GRAY2RGB)
+            colored_mask[(colored_mask[:, :, 1] == 255)] = clustering_result.centers[i]
+            colored_masks.append(colored_mask)
 
-        for i in range(0, len(self.images)):
-            colored_image = cv2.cvtColor(self.images[i], cv2.COLOR_GRAY2BGR)
-            colored_image = cv2.cvtColor(colored_image, cv2.COLOR_BGR2HLS)
-            # logger.info(f"Iteracja {i}\n")
-            print(round((float(self.color_ranges[i] + self.color_ranges[i + 1])) / 2))
+            # 2. Znajdź punkt w każdym obiekcie
+            object_points = find_inner_points_for_objects(mask)
+            all_points.append(object_points)
+            self.save_image("colored_mask" + str(i) + ".bmp", colored_mask)
 
-            # mid_hue = round((colorRanges[i - 1] + colorRanges[i]) / 2)
-            # Przekroczenie zakresu indeksu w 'colorRanges', poprawka w obliczeniu mid_hue
-            if i == 0:
-                mid_hue = round((float(self.color_ranges[i] + self.color_ranges[i + 1])) / 2)
-            else:
-                mid_hue = round((float(self.color_ranges[i - 1]) + float(self.color_ranges[i])) / 2)
+        combined_colored = combine_rgb_images(colored_masks)
+        combined_edges = combine_edges(contours)
+        canny = cv2.Canny(clustering_result.segmented_image, 75, 175, apertureSize=3, L2gradient=False)
+        self.save_image("canny.bmp", canny)
+        self.save_image("combined_colored.bmp", combined_colored)
+        self.save_image("combined_edges.bmp", combined_edges)
 
-            replacement = [mid_hue, 128, 255]
-            colored_image[(colored_image[:, :, 1] == 255)] = replacement  # Set the hue
-            colored_image = cv2.cvtColor(colored_image, cv2.COLOR_HLS2BGR)
-            final_colored_image = cv2.add(final_colored_image, colored_image)
-            self.save_image(f"coloredImage{i}.jpg", colored_image)
+        filtered_edges = remove_distortions(cv2.bitwise_not(combined_edges), 3)
 
-        self.save_image("final_colored_image.jpg", final_colored_image)
+        final_image = cv2.bitwise_and(cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB), combined_colored)
+        self.save_image("final_image.bmp", final_image)
+        self.save_image("combined_edges_filtered.bmp", filtered_edges)
+        self.save_image("segmented.bmp", clustering_result.segmented_image)
 
-    # def save_image(self, name: str, image) -> None:
-    #     cv2.imwrite(f"{self.OUTPUT_FOLDER}/{name}", image)
+        kolorowanka = cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
+
+        for i, object_points in enumerate(all_points):
+            for j, (r, c) in enumerate(object_points):
+                color = clustering_result.centers[i].astype("uint8")
+
+                cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
+
+        self.save_image("result.jpg", kolorowanka)
+
+
     def save_image(self, name: str, image) -> None:
         output_path = os.path.join(self.OUTPUT_FOLDER, self.task_id, name)
         try:

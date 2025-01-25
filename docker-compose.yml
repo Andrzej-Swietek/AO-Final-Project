@@ -11,14 +11,15 @@ services:
   backend:
     build:
       context: .
-      dockerfile: docker/backend/Dockerfile
+      dockerfile: backend/Dockerfile
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
+      - ./backend:/backend
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
+      - REDIS_HOST=redis
     depends_on:
       - redis
 
