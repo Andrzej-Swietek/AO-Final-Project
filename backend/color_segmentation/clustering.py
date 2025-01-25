@@ -64,16 +64,6 @@ def get_edges(mask: np.ndarray):
     return cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=1) - cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=1)
 
 
-def posterize_image(image, levels=4):
-    img_float = image.astype(np.float32)
-
-    step = 256 / levels
-
-    posterized = np.floor(img_float / step) * step
-
-    posterized = posterized.astype(np.uint8)
-    return posterized
-
 def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
 
     combined = np.zeros_like(edges[0], dtype=np.uint8)
@@ -83,6 +73,20 @@ def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
     combined[combined > 255] = 255
 
     return combined
+
+
+def shrink_to_points(binary_image: np.ndarray[np.uint8]) -> np.ndarray[np.uint8]:
+    img = binary_image.copy()
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
+
+    while True:
+        prev = img.copy()
+        img = cv2.erode(img, kernel)
+        if cv2.countNonZero(img ^ prev) == 0:
+            break
+
+    return prev
+
 
 
 def combine_rgb_images(images: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
