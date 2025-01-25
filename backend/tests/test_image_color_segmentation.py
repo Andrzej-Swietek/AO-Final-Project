@@ -20,7 +20,7 @@ class TestImageColorSegmentation(unittest.TestCase):
         assert 1 == 1
 
     def test_clustering(self):
-        clustering_result = kmeans_image_segmentation(cv2.imread("../example_images/img_4.png"), 8)
+        clustering_result = kmeans_image_segmentation(cv2.imread("../example_images/img_3.png"), 8)
         raw_masks = get_color_masks(clustering_result)
         contours = []
         colored_masks = []
@@ -44,6 +44,9 @@ class TestImageColorSegmentation(unittest.TestCase):
         cv2.imwrite("combined_colored.bmp", combined_colored)
         cv2.imwrite("combined_edges.bmp", combined_edges)
         filtered_edges = remove_distortions(cv2.bitwise_not(combined_edges), 3)
+        cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
+        final_image = cv2.bitwise_and(cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB), combined_colored)
+        cv2.imwrite("final_image.bmp", final_image)
         cv2.imwrite("combined_edges_filtered.bmp", filtered_edges)
         cv2.imwrite("segmented.bmp", clustering_result.segmented_image)
 
