@@ -1,6 +1,7 @@
 import unittest
 
 import cv2
+import numpy as np
 
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
