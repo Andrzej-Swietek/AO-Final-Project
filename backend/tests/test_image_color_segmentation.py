@@ -1,10 +1,9 @@
 import unittest
-from unittest.mock import patch, MagicMock, call
-import os
-import numpy as np
+
 import cv2
+
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
-    get_edges, combine_edges, combine_rgb_images
+    get_edges, combine_edges, combine_rgb_images, posterize_image
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
@@ -21,7 +20,7 @@ class TestImageColorSegmentation(unittest.TestCase):
         assert 1 == 1
 
     def test_clustering(self):
-        clustering_result = kmeans_image_segmentation(cv2.imread("../example_images/img_1.png"), 2)
+        clustering_result = kmeans_image_segmentation(cv2.imread("../example_images/img_4.png"), 8)
         raw_masks = get_color_masks(clustering_result)
         contours = []
         colored_masks = []
@@ -44,33 +43,12 @@ class TestImageColorSegmentation(unittest.TestCase):
         cv2.imwrite("canny.bmp", canny)
         cv2.imwrite("combined_colored.bmp", combined_colored)
         cv2.imwrite("combined_edges.bmp", combined_edges)
+        filtered_edges = remove_distortions(cv2.bitwise_not(combined_edges), 3)
+        cv2.imwrite("combined_edges_filtered.bmp", filtered_edges)
         cv2.imwrite("segmented.bmp", clustering_result.segmented_image)
 
     assert 1 == 1
 
-    def process(self) -> None:
-        final_colored_image = np.zeros_like(self.image)
-
-        for i in range(0, len(self.images)):
-            colored_image = cv2.cvtColor(self.images[i], cv2.COLOR_GRAY2BGR)
-            colored_image = cv2.cvtColor(colored_image, cv2.COLOR_BGR2HLS)
-            # logger.info(f"Iteracja {i}\n")
-            print(round((float(self.color_ranges[i] + self.color_ranges[i + 1])) / 2))
-
-            # mid_hue = round((colorRanges[i - 1] + colorRanges[i]) / 2)
-            # Przekroczenie zakresu indeksu w 'colorRanges', poprawka w obliczeniu mid_hue
-            if i == 0:
-                mid_hue = round((float(self.color_ranges[i] + self.color_ranges[i + 1])) / 2)
-            else:
-                mid_hue = round((float(self.color_ranges[i - 1]) + float(self.color_ranges[i])) / 2)
-
-            replacement = [mid_hue, 128, 255]
-            colored_image[(colored_image[:, :, 1] == 255)] = replacement  # Set the hue
-            colored_image = cv2.cvtColor(colored_image, cv2.COLOR_HLS2BGR)
-            final_colored_image = cv2.add(final_colored_image, colored_image)
-            self.save_image(f"coloredImage{i}.jpg", colored_image)
-
-        self.save_image("final_colored_image.jpg", final_colored_image)
 
 
 if __name__ == "__main__":

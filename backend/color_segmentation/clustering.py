@@ -55,13 +55,24 @@ def get_color_masks(result: KMeansResult) -> list[np.ndarray[np.uint8]]:
     return masks
 
 
-def remove_distortions(binary_image: np.ndarray[np.uint8]) -> np.ndarray[np.uint8]:
-    result = cv2.erode(binary_image, np.ones((7, 7), np.uint8), iterations=1)
-    result = cv2.dilate(result, np.ones((7, 7), np.uint8), iterations=1)
+def remove_distortions(binary_image: np.ndarray[np.uint8], power: int = 5) -> np.ndarray[np.uint8]:
+    result = cv2.erode(binary_image, np.ones((power, power), np.uint8), iterations=1)
+    result = cv2.dilate(result, np.ones((power, power), np.uint8), iterations=1)
     return result
 
 def get_edges(mask: np.ndarray):
-    return mask - cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
+    return cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=1) - cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=1)
+
+
+def posterize_image(image, levels=4):
+    img_float = image.astype(np.float32)
+
+    step = 256 / levels
+
+    posterized = np.floor(img_float / step) * step
+
+    posterized = posterized.astype(np.uint8)
+    return posterized
 
 def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
 
@@ -82,4 +93,3 @@ def combine_rgb_images(images: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint
 
     combined = np.clip(combined, 0, 255).astype(np.uint8)  # Clip values to 0-255 and convert back to uint8
     return combined
-
