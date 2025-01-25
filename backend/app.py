@@ -113,7 +113,7 @@ def download_filled_image(task_id):
         return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
 
     if task_status_str in ['Finished', 'Completed']:
-        output_path = f"../output/{task_id}/final_image.jpg"
+        output_path = f"./output/{task_id}/final_image.jpg"
         if os.path.exists(output_path):
             return send_file_with_attachment(output_path, 'result.jpg')
         else:
