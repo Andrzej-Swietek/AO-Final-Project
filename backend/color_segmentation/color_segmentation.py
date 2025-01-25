@@ -26,7 +26,7 @@ class ImageColorSegmentation:
 
     def load_image(self, image_path: str) -> None:
         self.original_image = cv2.imread(image_path)
-        self.original_image = sharpen_image(self.original_image)
+        # self.original_image = sharpen_image(self.original_image)
 
         self.images = []
         k_means_result = kmeans_image_segmentation(self.original_image, 8)

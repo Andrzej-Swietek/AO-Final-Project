@@ -52,11 +52,11 @@ class TestImageColorSegmentation(unittest.TestCase):
                 cv2.circle(vis, (c, r), radius=4, color=(0, 0, 255), thickness=-1)
 
                 # Dodajemy numer (niebieski), lekko przesunięty w prawo
-                cv2.putText(vis, str(j), (c + 6, r),
+                cv2.putText(vis, str(i), (c, r),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                            fontScale=0.6,
+                            fontScale=0.3,
                             color=(255, 0, 0),
-                            thickness=2)
+                            thickness=1)
 
             cv2.imwrite("vis" + str(i) + ".bmp", vis)
             cv2.imwrite("colored_mask" + str(i) + ".bmp", colored_mask)
