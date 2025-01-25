@@ -4,7 +4,8 @@ import os
 import cv2
 import numpy as np
 
-from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks
+from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
+    get_edges
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -22,9 +23,6 @@ class ImageColorSegmentation:
         self.image = None
         self.task_id = task_id
 
-    @staticmethod
-    def get_edges(mask: np.ndarray):
-        return mask - cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
 
     def load_image(self, image_path: str) -> None:
         self.original_image = cv2.imread(image_path)
@@ -32,8 +30,8 @@ class ImageColorSegmentation:
         k_means_result = kmeans_image_segmentation(self.original_image, 8)
         self.color_masks = get_color_masks(k_means_result)
         print(self.color_masks)
-        self.color_masks = [cv2.medianBlur(mask, 7) for mask in self.color_masks]
-        self.color_masks = [self.get_edges(mask) for mask in self.color_masks]
+        self.color_masks = [remove_distortions(mask) for mask in self.color_masks]
+        self.color_masks = [get_edges(mask) for mask in self.color_masks]
 
         for i in range(len(self.color_masks)):
             cv2.imwrite("mask" + str(i) + ".bmp", self.color_masks[i])

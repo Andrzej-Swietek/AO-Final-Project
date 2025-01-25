@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 
+import cv2
 import numpy as np
 import cv2 as cv
 import os
+
+from cv2 import reduce
+from fontTools.misc.cython import returns
 
 
 @dataclass
@@ -12,6 +16,7 @@ class KMeansResult:
     centers: np.ndarray[np.uint8]  # shape (K, 3)
 
 def kmeans_image_segmentation(image: np.ndarray[np.uint8], k: int) -> KMeansResult:
+
     # Reshape image to a 2D array of pixels (H*W, 3)
     pixels = image.reshape((-1, 3))
 
@@ -49,4 +54,32 @@ def get_color_masks(result: KMeansResult) -> list[np.ndarray[np.uint8]]:
 
     return masks
 
+
+def remove_distortions(binary_image: np.ndarray[np.uint8]) -> np.ndarray[np.uint8]:
+    result = cv2.erode(binary_image, np.ones((7, 7), np.uint8), iterations=1)
+    result = cv2.dilate(result, np.ones((7, 7), np.uint8), iterations=1)
+    return result
+
+def get_edges(mask: np.ndarray):
+    return mask - cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
+
+def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
+
+    combined = np.zeros_like(edges[0], dtype=np.uint8)
+    for edge in edges:
+        combined = cv.add(combined, edge)
+
+    combined[combined > 255] = 255
+
+    return combined
+
+
+def combine_rgb_images(images: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
+
+    combined = np.zeros_like(images[0], dtype=np.uint16)  # Use uint16 to avoid overflow during addition
+    for image in images:
+        combined += image  # Add pixel values
+
+    combined = np.clip(combined, 0, 255).astype(np.uint8)  # Clip values to 0-255 and convert back to uint8
+    return combined
 
