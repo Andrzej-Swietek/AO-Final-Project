@@ -51,7 +51,7 @@ def remove_distortions(binary_image: np.ndarray[np.uint8], power: int = 5) -> np
     return result
 
 def get_edges(mask: np.ndarray):
-    return cv2.dilate(mask, np.ones((5, 5), np.uint8), iterations=1) - cv2.erode(mask, np.ones((5, 5), np.uint8), iterations=1)
+    return cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1) - cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
 
 
 def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
@@ -130,7 +130,7 @@ def find_inner_points_for_objects(bin_image):
 
     return points
 
-def scale_image(og_image: np.ndarray, size: int = 256) -> np.ndarray:
+def scale_image(og_image: np.ndarray, size: int = 512) -> np.ndarray:
     original_height, original_width = og_image.shape[:2]
 
     if original_width > original_height:
@@ -146,11 +146,11 @@ def scale_image(og_image: np.ndarray, size: int = 256) -> np.ndarray:
     return resized_image
 
 
-def put_text_with_center_at(image: np.ndarray, text: str, x: int, y: int):
+def put_text_with_center_at(image: np.ndarray, text: str, x: int, y: int, color: tuple[int, int, int]):
     text = str(text)
     font_face = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.3
-    color = (255, 0, 0)
+    # color = 0 # (255, 0, 0)
     thickness = 1
     (x, y) = (x, y)
     (text_width, text_height), baseline = cv2.getTextSize(text, font_face, font_scale, thickness)

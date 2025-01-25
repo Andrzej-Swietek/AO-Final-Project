@@ -23,13 +23,15 @@ class TestImageColorSegmentation(unittest.TestCase):
         assert 1 == 1
 
     def test_clustering(self):
-        og_image = cv2.imread("../example_images/img_3.png")
+        og_image = cv2.imread("../example_images/img_7.png")
         og_image = scale_image(og_image)
 
-        clustering_result = kmeans_image_segmentation(og_image, 8)
+        clustering_result = kmeans_image_segmentation(og_image, 6)
         raw_masks = get_color_masks(clustering_result)
         contours = []
         colored_masks = []
+        all_points = []
+
         for i in range(len(raw_masks)):
             cv2.imwrite("raw_mask" + str(i) + ".bmp", raw_masks[i])
             mask = remove_distortions(raw_masks[i])
@@ -44,19 +46,7 @@ class TestImageColorSegmentation(unittest.TestCase):
 
             # 2. Znajdź punkt w każdym obiekcie
             object_points = find_inner_points_for_objects(mask)
-
-            # 3. Utwórz kolorową kopię do wizualizacji
-            vis = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-
-            # 4. Zaznacz punkty i ponumeruj
-            for j, (r, c) in enumerate(object_points, start=1):
-                # Rysujemy kółko w punkcie (czerwone)
-                # cv2.circle(vis, (c, r), radius=4, color=(0, 0, 255), thickness=-1)
-
-                # Dodajemy numer (niebieski), lekko przesunięty w prawo
-                put_text_with_center_at(vis, str(i), c, r)
-
-            cv2.imwrite("vis" + str(i) + ".bmp", vis)
+            all_points.append(object_points)
             cv2.imwrite("colored_mask" + str(i) + ".bmp", colored_mask)
 
         combined_colored = combine_rgb_images(colored_masks)
@@ -66,11 +56,22 @@ class TestImageColorSegmentation(unittest.TestCase):
         cv2.imwrite("combined_colored.bmp", combined_colored)
         cv2.imwrite("combined_edges.bmp", combined_edges)
         filtered_edges = remove_distortions(cv2.bitwise_not(combined_edges), 3)
-        cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
+
         final_image = cv2.bitwise_and(cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB), combined_colored)
         cv2.imwrite("final_image.bmp", final_image)
         cv2.imwrite("combined_edges_filtered.bmp", filtered_edges)
         cv2.imwrite("segmented.bmp", clustering_result.segmented_image)
+
+        kolorowanka = cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
+
+        for i, object_points in enumerate(all_points):
+            for j, (r, c) in enumerate(object_points):
+                # Rysujemy kółko w punkcie (czerwone)
+                color = clustering_result.centers[i].astype("uint8")
+
+                cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
+
+        cv2.imwrite("kolorowanka.bmp", kolorowanka)
 
     assert 1 == 1
 
