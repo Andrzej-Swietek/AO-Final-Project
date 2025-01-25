@@ -10,6 +10,7 @@ def process_image_in_background(content_image_path: str, difficulty: str, task_i
     try:
         color_segmentation = ImageColorSegmentation(task_id)
         color_segmentation.load_image(content_image_path)
+        color_segmentation.process_image()
 
         logger.info(f"Processing image for task {task_id} with difficulty {difficulty}...")
 

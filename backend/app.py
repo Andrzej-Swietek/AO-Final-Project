@@ -104,6 +104,27 @@ def download(task_id):
         return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
 
 
+@app.route('/api/download-filled-image/<task_id>', methods=['GET'])
+@cross_origin()
+def download(task_id):
+    task = redis_client.get(task_id)
+    task_status_str = task.decode('utf-8')
+    if task is None:
+        return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
+
+    if task_status_str in ['Finished', 'Completed']:
+        output_path = f"../output/{task_id}/final_image.jpg"
+        if os.path.exists(output_path):
+            return send_file_with_attachment(output_path, 'result.jpg')
+        else:
+            return jsonify({
+                'task_id': task_id,
+                'status': 'Output file not found'
+            }), 404
+    else:
+        return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
+
+
 @app.route("/api/task_status_stream/<task_id>", methods=["GET"])
 def task_status_stream(task_id):
     def generate():

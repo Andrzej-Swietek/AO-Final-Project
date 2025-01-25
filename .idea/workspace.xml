@@ -5,12 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16e305a9-68c5-449f-915a-efdd463a86c3" name="Changes" comment="changes">
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_10.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_11.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_12.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_13.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_14.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/example_images/img_5.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/example_images/img_6.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/example_images/img_7.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_8.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/example_images/img_9.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/tests/test_image_color_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_image_color_segmentation.py" afterDir="false" />
     </list>
-    <list id="dfc1a909-06d3-4521-a3ab-d518ba2855bc" name="Changes by andrzej" comment="" />
+    <list id="dfc1a909-06d3-4521-a3ab-d518ba2855bc" name="Changes by andrzej" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/worker/image_worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/worker/image_worker.py" afterDir="false" />
+    </list>
+    <list id="70315e43-0f4b-4955-b088-a4695f4d9434" name="Changes by marcin" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,6 +69,19 @@
     &quot;accountId&quot;: &quot;68f1785d-60d3-4211-aa3d-67393b0ef5ec&quot;
   }
 }</component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py">
+      <ranges>
+        <range start1="7" end1="8" start2="7" end2="8" changelist="dfc1a909-06d3-4521-a3ab-d518ba2855bc" />
+        <range start1="21" end1="22" start2="21" end2="21" changelist="70315e43-0f4b-4955-b088-a4695f4d9434" />
+        <range start1="27" end1="29" start2="26" end2="56" changelist="dfc1a909-06d3-4521-a3ab-d518ba2855bc" />
+        <range start1="30" end1="34" start2="57" end2="58" changelist="dfc1a909-06d3-4521-a3ab-d518ba2855bc" />
+        <range start1="35" end1="38" start2="59" end2="63" changelist="dfc1a909-06d3-4521-a3ab-d518ba2855bc" />
+        <range start1="39" end1="41" start2="64" end2="65" changelist="dfc1a909-06d3-4521-a3ab-d518ba2855bc" />
+        <range start1="42" end1="47" start2="66" end2="73" changelist="dfc1a909-06d3-4521-a3ab-d518ba2855bc" />
+      </ranges>
+    </file>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -293,7 +321,7 @@
       <workItem from="1737288361775" duration="7000" />
       <workItem from="1737733283924" duration="36000" />
       <workItem from="1737733324734" duration="17090000" />
-      <workItem from="1737804343912" duration="27207000" />
+      <workItem from="1737804343912" duration="28852000" />
     </task>
     <task id="LOCAL-00001" summary="init commit">
       <option name="closed" value="true" />
@@ -383,7 +411,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737841024620</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="changes">
+      <option name="closed" value="true" />
+      <created>1737841256171</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1737841256171</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -433,7 +469,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/grafika_project$.coverage" NAME=" Coverage Results" MODIFIED="1737840985500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/tests" />
+    <SUITE FILE_PATH="coverage/grafika_project$.coverage" NAME=" Coverage Results" MODIFIED="1737841971336" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/tests" />
     <SUITE FILE_PATH="coverage/grafika_project$interactive.coverage" NAME="main2 Coverage Results" MODIFIED="1735218123751" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/grafika_project$app.coverage" NAME="app Coverage Results" MODIFIED="1737820394630" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
     <SUITE FILE_PATH="coverage/grafika_project$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1737805048479" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/color_segmentation" />

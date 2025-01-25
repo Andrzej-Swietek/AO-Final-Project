@@ -32,10 +32,10 @@ class TestImageColorSegmentation(unittest.TestCase):
                 os.remove(file_path)  # Remove the file
                 print(f"Deleted: {file_path}")
 
-        og_image = cv2.imread("../example_images/img_7.png")
+        og_image = cv2.imread("../example_images/img_14.png")
         og_image = scale_image(og_image)
 
-        clustering_result = kmeans_image_segmentation(og_image, 7)
+        clustering_result = kmeans_image_segmentation(og_image, 6)
         raw_masks = get_color_masks(clustering_result)
         contours = []
         colored_masks = []
