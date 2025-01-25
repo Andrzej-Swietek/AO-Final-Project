@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
-    get_edges
+    get_edges, sharpen_image
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -26,9 +26,13 @@ class ImageColorSegmentation:
 
     def load_image(self, image_path: str) -> None:
         self.original_image = cv2.imread(image_path)
+        self.original_image = sharpen_image(self.original_image)
+
         self.images = []
         k_means_result = kmeans_image_segmentation(self.original_image, 8)
+        # k_means_result.segmented_image = cv2.medianBlur(k_means_result.segmented_image, 3)
         self.color_masks = get_color_masks(k_means_result)
+
         print(self.color_masks)
         self.color_masks = [remove_distortions(mask) for mask in self.color_masks]
         self.color_masks = [get_edges(mask) for mask in self.color_masks]

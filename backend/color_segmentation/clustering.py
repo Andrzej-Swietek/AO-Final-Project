@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 import cv2
 import numpy as np
@@ -7,6 +8,7 @@ import os
 
 from cv2 import reduce
 from fontTools.misc.cython import returns
+from numpy import ndarray, dtype, floating
 
 
 @dataclass
@@ -97,3 +99,46 @@ def combine_rgb_images(images: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint
 
     combined = np.clip(combined, 0, 255).astype(np.uint8)  # Clip values to 0-255 and convert back to uint8
     return combined
+
+
+def sharpen_image(image: np.ndarray[np.uint8], k: int = 3) -> np.ndarray[np.uint8]:
+    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+    sharpened_image = cv2.filter2D(image, -1, kernel)
+    # filter_matrix = make_filter_matrix(k)
+    # filtered_image = cv2.filter2D(src=image, ddepth=-1, kernel=filter_matrix)
+    return sharpened_image
+
+def make_filter_matrix(k: int) -> np.ndarray[np.float32]:
+    if k % 2 == 0:
+        raise ValueError("Filter size 'k' must be odd.")
+    filter_matrix = -1 * np.ones((k, k), dtype=np.float32)
+    center = k // 2
+    filter_matrix[center, center] = k**2 - 1
+    return filter_matrix
+
+
+def find_inner_points_for_objects(bin_image):
+    """
+    bin_image: numpy array typu uint8, 0/255 (binarne tło/obiekt)
+
+    Zwraca listę krotek (r, c) – po jednym punkcie dla każdego
+    8-spójnego obiektu w obrazie. Punkt jest wybrany tak, by był
+    maksymalnie daleko od brzegu (transformacja odległości).
+    """
+    num_labels, labels = cv2.connectedComponents(bin_image, connectivity=8)
+
+    bin01 = (bin_image > 0).astype(np.uint8)
+    dist_map = cv2.distanceTransform(bin01, cv2.DIST_L2, 3)
+
+    points = []
+    for label_idx in range(1, num_labels):
+        masked_dist = dist_map.copy()
+        masked_dist[labels != label_idx] = 0
+        # Znajdź maksimum w "masked_dist"
+        minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(masked_dist)
+        # maxLoc jest (x, y) => (kolumna, wiersz)
+        r, c = maxLoc[1], maxLoc[0]
+        points.append((r, c))
+
+    return points
+
