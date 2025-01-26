@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {useToast} from "@/hooks/use-toast.ts";
-import {Input} from "@/components/ui/input.tsx";
 import {
   Select,
   SelectContent,
@@ -27,8 +26,8 @@ export const UploadPage = () => {
   const [colorCount, setColorCount] = useState<string | null>(null);
   const { toast } = useToast()
 
-  // const PUBLIC_API_URL = "http://localhost:5000";
-  const PUBLIC_API_URL =  import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+  const PUBLIC_API_URL = "";
+  // const PUBLIC_API_URL =  import.meta.env.VITE_API_URL ?? "";
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -69,7 +68,7 @@ export const UploadPage = () => {
       return;
     }
 
-    if (colorCount < 1 || colorCount > 33) {
+    if (!colorCount || (parseInt(colorCount) < 1 || parseInt(colorCount) > 33)) {
       toast({
         title: "Invalid Input",
         description: "Please select a color count between 2 and 32"
@@ -195,7 +194,7 @@ export const UploadPage = () => {
                       <SelectTrigger className="w-[280px]">
                         <SelectValue
                             placeholder="Select number of colors"
-                            value={colorCount}
+                            // value={colorCount}
                         />
                       </SelectTrigger>
                       <SelectContent>

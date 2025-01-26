@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16e305a9-68c5-449f-915a-efdd463a86c3" name="Changes" comment="changes">
-      <change beforePath="$PROJECT_DIR$/.idea/AO-Final-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AO-Final-Project.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/routes/WelcomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/WelcomePage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.node.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.node.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +102,7 @@
       <recent name="$PROJECT_DIR$/backend" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="npm.build">
     <configuration name="All services" type="CompoundRunConfigurationType">
       <toRun name="dev" type="js.build_tools.npm" />
       <toRun name="app" type="PythonConfigurationType" />
@@ -153,6 +152,16 @@
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
       <method v="2" />
     </configuration>
     <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
@@ -232,6 +241,7 @@
     <list>
       <item itemvalue="Compound.All services" />
       <item itemvalue="npm.dev" />
+      <item itemvalue="npm.build" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.app" />
       <item itemvalue="Python tests.Python tests in /home/andrzej/Documents/AO-Final-Project/backend/test/test_image_color_segmentation.py" />
@@ -241,6 +251,7 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.build" />
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_clustering" />
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development_case_2" />
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development" />
@@ -275,7 +286,7 @@
       <workItem from="1737733283924" duration="36000" />
       <workItem from="1737733324734" duration="17090000" />
       <workItem from="1737804343912" duration="29642000" />
-      <workItem from="1737900050056" duration="4254000" />
+      <workItem from="1737900050056" duration="7058000" />
     </task>
     <task id="LOCAL-00001" summary="init commit">
       <option name="closed" value="true" />

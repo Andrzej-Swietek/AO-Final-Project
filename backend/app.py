@@ -14,7 +14,7 @@ from backend.worker.image_worker import process_image_in_background
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-app = Flask(__name__, static_folder="static")
+app = Flask(__name__, static_folder="../frontend/dist")
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000  # 16MB
 CORS(app)
 OUTPUT_FOLDER = "./output/"
@@ -29,13 +29,17 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-@cross_origin()
-def serve_frontend(path):
-    if path and path.startswith("static"):
+@app.route('/', methods=['GET'])
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route("/<path:path>", methods=['GET'])
+def serve_angular(path):
+    try:
         return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, "index.html")
+    except:
+        return send_from_directory(app.static_folder, "index.html")
 
 
 @app.route("/api", methods=["GET"])
