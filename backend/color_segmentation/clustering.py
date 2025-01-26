@@ -105,14 +105,7 @@ def make_filter_matrix(k: int) -> np.ndarray[np.float32]:
     return filter_matrix
 
 
-def find_inner_points_for_objects(bin_image):
-    """
-    bin_image: numpy array typu uint8, 0/255 (binarne tło/obiekt)
-
-    Zwraca listę krotek (r, c) – po jednym punkcie dla każdego
-    8-spójnego obiektu w obrazie. Punkt jest wybrany tak, by był
-    maksymalnie daleko od brzegu (transformacja odległości).
-    """
+def find_inner_points_for_objects(bin_image: np.ndarray[np.uint8]) -> list[tuple[int, int]]:
     num_labels, labels = cv2.connectedComponents(bin_image, connectivity=8)
 
     bin01 = (bin_image > 0).astype(np.uint8)
@@ -125,7 +118,7 @@ def find_inner_points_for_objects(bin_image):
         # Znajdź maksimum w "masked_dist"
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(masked_dist)
         # maxLoc jest (x, y) => (kolumna, wiersz)
-        r, c = maxLoc[1], maxLoc[0]
+        r, c = min(max(maxLoc[1], 5), bin_image.shape[0] - 5), min(max(maxLoc[0], 5), bin_image.shape[1] - 5)
         points.append((r, c))
 
     return points
@@ -150,7 +143,6 @@ def put_text_with_center_at(image: np.ndarray, text: str, x: int, y: int, color:
     text = str(text)
     font_face = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.3
-    # color = 0 # (255, 0, 0)
     thickness = 1
     (x, y) = (x, y)
     (text_width, text_height), baseline = cv2.getTextSize(text, font_face, font_scale, thickness)

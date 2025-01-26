@@ -30,7 +30,7 @@ class TestImageColorSegmentation(unittest.TestCase):
                 os.remove(file_path)  # Remove the file
                 print(f"Deleted: {file_path}")
 
-        og_image = cv2.imread("../example_images/img_3.png")
+        og_image = cv2.imread("../example_images/img_6.png")
         og_image = scale_image(og_image)
         cv2.imwrite("original.bmp", og_image)
         og_image = cv2.bilateralFilter(og_image, 9, 125, 125)
