@@ -45,21 +45,14 @@ class ImageColorSegmentation:
             # 2. Znajdź punkt w każdym obiekcie
             object_points = find_inner_points_for_objects(mask)
             all_points.append(object_points)
-            self.save_image("colored_mask" + str(i) + ".bmp", colored_mask)
 
         combined_colored = combine_rgb_images(colored_masks)
         combined_edges = combine_edges(contours)
-        canny = cv2.Canny(clustering_result.segmented_image, 75, 175, apertureSize=3, L2gradient=False)
-        self.save_image("canny.bmp", canny)
-        self.save_image("combined_colored.bmp", combined_colored)
-        self.save_image("combined_edges.bmp", combined_edges)
 
         filtered_edges = remove_distortions(cv2.bitwise_not(combined_edges), 3)
 
         final_image = cv2.bitwise_and(cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB), combined_colored)
         self.save_image("final_image.bmp", final_image)
-        self.save_image("combined_edges_filtered.bmp", filtered_edges)
-        self.save_image("segmented.bmp", clustering_result.segmented_image)
 
         kolorowanka = cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
 
