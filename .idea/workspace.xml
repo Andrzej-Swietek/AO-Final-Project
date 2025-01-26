@@ -5,12 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16e305a9-68c5-449f-915a-efdd463a86c3" name="Changes" comment="changes">
+      <change beforePath="$PROJECT_DIR$/.idea/AO-Final-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AO-Final-Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/worker/image_worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/worker/image_worker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routes/WelcomePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/WelcomePage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +54,9 @@
     &quot;accountId&quot;: &quot;68f1785d-60d3-4211-aa3d-67393b0ef5ec&quot;
   }
 }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -79,7 +81,7 @@
     "Python.test2.executor": "Run",
     "Python.test3.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "colors-select",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/home/andrzej/Documents/AO-Final-Project/frontend/public",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -249,8 +251,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-PY-242.21829.153" />
-        <option value="bundled-python-sdk-464836ebc622-b74155a9e76b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.21829.153" />
+        <option value="bundled-python-sdk-67fca87a943a-c986f194a52a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.11799.259" />
       </set>
     </attachedChunks>
   </component>
@@ -274,6 +275,7 @@
       <workItem from="1737733283924" duration="36000" />
       <workItem from="1737733324734" duration="17090000" />
       <workItem from="1737804343912" duration="29642000" />
+      <workItem from="1737900050056" duration="4254000" />
     </task>
     <task id="LOCAL-00001" summary="init commit">
       <option name="closed" value="true" />
@@ -412,7 +414,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="improve-dev-experience" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>

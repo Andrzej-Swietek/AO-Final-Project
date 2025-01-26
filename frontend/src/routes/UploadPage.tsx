@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import {useToast} from "@/hooks/use-toast.ts";
 import {Input} from "@/components/ui/input.tsx";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type OperationStatus =
     'Finished'
@@ -16,7 +24,7 @@ export const UploadPage = () => {
   const [contentImageUrl, setContentImageUrl] = useState<string | null>(null);
   const [resultImages, setResultImages] = useState<string[]>([]);
   const [taskId, setTaskId] = useState<string>("");
-  const [colorCount, setColorCount] = useState<number>(3);
+  const [colorCount, setColorCount] = useState<string | null>(null);
   const { toast } = useToast()
 
   // const PUBLIC_API_URL = "http://localhost:5000";
@@ -61,17 +69,17 @@ export const UploadPage = () => {
       return;
     }
 
-    if (colorCount < 1 || colorCount > 10) {
+    if (colorCount < 1 || colorCount > 33) {
       toast({
         title: "Invalid Input",
-        description: "Please select a color count between 1 and 10"
+        description: "Please select a color count between 2 and 32"
       });
       return;
     }
 
     const formData = new FormData();
     formData.append("image", contentImage);
-    formData.append("color_count", colorCount.toString());
+    formData.append("color_count", colorCount?.toString());
 
     setStatus("Uploading...");
     try {
@@ -122,18 +130,6 @@ export const UploadPage = () => {
         description: "Please try again later",
       })
       console.error("Error uploading the image:", error);
-    }
-  };
-
-  const handleColorCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === "") {
-      setColorCount(1); // Reset to minimum allowed value if input is cleared
-    } else {
-      const parsedValue = Number(value);
-      if (!isNaN(parsedValue)) {
-        setColorCount(parsedValue);
-      }
     }
   };
 
@@ -191,18 +187,28 @@ export const UploadPage = () => {
                   </div>
                   <div className="flex flex-col items-start w-[280px] mt-4">
                     <label htmlFor="colorCount" className="text-sm font-medium text-muted-foreground mb-2">
-                      Select Color Count (1-10)
+                      Select Color Count
                     </label>
-                    <Input
-                        id="colorCount"
-                        type="number"
-                        min={1}
-                        max={10}
-                        value={colorCount}
-                        onChange={handleColorCountChange}
-                        className="w-full"
-                        placeholder="Enter color count"
-                    />
+                     <Select
+                         onValueChange={(value) => setColorCount(value)}
+                     >
+                      <SelectTrigger className="w-[280px]">
+                        <SelectValue
+                            placeholder="Select number of colors"
+                            value={colorCount}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Color count</SelectLabel>
+                          {
+                            [2, 3, 4, 5, 6, 8, 10, 12, 16, 24, 32].map(num=>
+                                <SelectItem key={num} value={`${num}`}>{num}</SelectItem>
+                            )
+                          }
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </>
             ) : (
