@@ -5,7 +5,7 @@ import cv2
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
     get_edges, combine_edges, combine_rgb_images, find_inner_points_for_objects, \
-    scale_image, find_optimal_k2
+    scale_image
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
@@ -30,13 +30,13 @@ class TestImageColorSegmentation(unittest.TestCase):
                 os.remove(file_path)  # Remove the file
                 print(f"Deleted: {file_path}")
 
-        og_image = cv2.imread("../example_images/img_4.png")
+        og_image = cv2.imread("../example_images/img_1.png")
         og_image = scale_image(og_image)
         cv2.imwrite("original.bmp", og_image)
         og_image = cv2.bilateralFilter(og_image, 9, 125, 125)
         cv2.imwrite("original_filtered.bmp", og_image)
         # og_image = cv2.cvtColor(og_image, cv2.COLOR_RGB2LAB)
-        clustering_result = kmeans_image_segmentation(og_image, find_optimal_k2(og_image))
+        clustering_result = kmeans_image_segmentation(og_image, 6)
         # clustering_result.segmented_image = cv2.cvtColor(clustering_result.segmented_image, cv2.COLOR_LAB2RGB)
         # print(clustering_result.centers)
         # clustering_result.centers = cv2.cvtColor(clustering_result.centers[np.newaxis, :, :], cv2.COLOR_LAB2RGB)[0]
@@ -85,7 +85,7 @@ class TestImageColorSegmentation(unittest.TestCase):
                 # Rysujemy kółko w punkcie (czerwone)
                 color = clustering_result.centers[i].astype("uint8")
                 radius = 5
-                if area < 80:
+                if area < 100:
                     radius = 3
                 cv2.circle(kolorowanka, (c, r), radius=radius, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
 

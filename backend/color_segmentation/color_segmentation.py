@@ -60,7 +60,7 @@ class ImageColorSegmentation:
             for j, (r, c, area) in enumerate(object_points):
                 color = clustering_result.centers[i].astype("uint8")
                 radius = 5
-                if area < 80:
+                if area < 100:
                     radius = 3
                 cv2.circle(kolorowanka, (c, r), radius=radius, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
 
