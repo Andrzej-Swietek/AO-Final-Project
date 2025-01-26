@@ -2,12 +2,10 @@ import os
 import unittest
 
 import cv2
-import numpy as np
-
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
     get_edges, combine_edges, combine_rgb_images, find_inner_points_for_objects, \
-    scale_image, put_text_with_center_at
+    scale_image
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
@@ -32,10 +30,16 @@ class TestImageColorSegmentation(unittest.TestCase):
                 os.remove(file_path)  # Remove the file
                 print(f"Deleted: {file_path}")
 
-        og_image = cv2.imread("../example_images/img_14.png")
+        og_image = cv2.imread("../example_images/img_3.png")
         og_image = scale_image(og_image)
-
-        clustering_result = kmeans_image_segmentation(og_image, 6)
+        cv2.imwrite("original.bmp", og_image)
+        og_image = cv2.bilateralFilter(og_image, 9, 125, 125)
+        cv2.imwrite("original_filtered.bmp", og_image)
+        # og_image = cv2.cvtColor(og_image, cv2.COLOR_RGB2LAB)
+        clustering_result = kmeans_image_segmentation(og_image, 8)
+        # clustering_result.segmented_image = cv2.cvtColor(clustering_result.segmented_image, cv2.COLOR_LAB2RGB)
+        # print(clustering_result.centers)
+        # clustering_result.centers = cv2.cvtColor(clustering_result.centers[np.newaxis, :, :], cv2.COLOR_LAB2RGB)[0]
         raw_masks = get_color_masks(clustering_result)
         contours = []
         colored_masks = []
@@ -63,11 +67,14 @@ class TestImageColorSegmentation(unittest.TestCase):
         canny = cv2.Canny(clustering_result.segmented_image, 75, 175, apertureSize=3, L2gradient=False)
         cv2.imwrite("canny.bmp", canny)
         cv2.imwrite("combined_colored.bmp", combined_colored)
+
         cv2.imwrite("combined_edges.bmp", combined_edges)
         filtered_edges = remove_distortions(cv2.bitwise_not(combined_edges), 3)
 
         final_image = cv2.bitwise_and(cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB), combined_colored)
         cv2.imwrite("final_image.bmp", final_image)
+        final_canny = cv2.Canny(final_image, 75, 175)
+        cv2.imwrite("final_canny.bmp", final_canny)
         cv2.imwrite("combined_edges_filtered.bmp", filtered_edges)
         cv2.imwrite("segmented.bmp", clustering_result.segmented_image)
 
@@ -78,7 +85,8 @@ class TestImageColorSegmentation(unittest.TestCase):
                 # Rysujemy kółko w punkcie (czerwone)
                 color = clustering_result.centers[i].astype("uint8")
 
-                cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
+                cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])),
+                           thickness=-1)
 
         cv2.imwrite("kolorowanka.bmp", kolorowanka)
 
@@ -86,7 +94,6 @@ class TestImageColorSegmentation(unittest.TestCase):
 
     def test_of_test(self):
         assert 1 == 1
-
 
 
 if __name__ == "__main__":

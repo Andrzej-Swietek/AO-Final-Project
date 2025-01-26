@@ -2,10 +2,9 @@ import logging
 import os
 
 import cv2
-import numpy as np
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
-    get_edges, sharpen_image, scale_image, find_inner_points_for_objects, combine_rgb_images, combine_edges
+    get_edges, scale_image, find_inner_points_for_objects, combine_rgb_images, combine_edges
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -26,6 +25,7 @@ class ImageColorSegmentation:
     def load_image(self, image_path: str) -> None:
         self.image = cv2.imread(image_path)
         self.image = scale_image(self.image)
+        self.image = cv2.bilateralFilter(self.image, 9, 125, 125)
 
     def process_image(self):
         clustering_result = kmeans_image_segmentation(self.image, 6)
