@@ -25,6 +25,7 @@ instance/
 
 # General
 .DS_Store
+.idea
 Thumbs.db
 .vscode/
 *.swp
