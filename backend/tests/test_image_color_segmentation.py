@@ -5,7 +5,7 @@ import cv2
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
     get_edges, combine_edges, combine_rgb_images, find_inner_points_for_objects, \
-    scale_image, find_optimal_k, find_optimal_k2
+    scale_image, find_optimal_k2
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
@@ -81,12 +81,13 @@ class TestImageColorSegmentation(unittest.TestCase):
         kolorowanka = cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
 
         for i, object_points in enumerate(all_points):
-            for j, (r, c) in enumerate(object_points):
+            for j, (r, c, area) in enumerate(object_points):
                 # Rysujemy kółko w punkcie (czerwone)
                 color = clustering_result.centers[i].astype("uint8")
-
-                cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])),
-                           thickness=-1)
+                radius = 5
+                if area < 80:
+                    radius = 3
+                cv2.circle(kolorowanka, (c, r), radius=radius, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
 
         cv2.imwrite("kolorowanka.bmp", kolorowanka)
 

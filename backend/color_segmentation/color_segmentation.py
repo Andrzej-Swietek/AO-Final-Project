@@ -57,10 +57,12 @@ class ImageColorSegmentation:
         kolorowanka = cv2.cvtColor(filtered_edges, cv2.COLOR_GRAY2RGB)
 
         for i, object_points in enumerate(all_points):
-            for j, (r, c) in enumerate(object_points):
+            for j, (r, c, area) in enumerate(object_points):
                 color = clustering_result.centers[i].astype("uint8")
-
-                cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
+                radius = 5
+                if area < 80:
+                    radius = 3
+                cv2.circle(kolorowanka, (c, r), radius=radius, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
 
         self.save_image("result.jpg", kolorowanka)
 

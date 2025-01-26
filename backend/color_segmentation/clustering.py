@@ -169,8 +169,8 @@ def make_filter_matrix(k: int) -> np.ndarray[np.float32]:
     return filter_matrix
 
 
-def find_inner_points_for_objects(bin_image: np.ndarray[np.uint8]) -> list[tuple[int, int]]:
-    num_labels, labels = cv2.connectedComponents(bin_image, connectivity=8)
+def find_inner_points_for_objects(bin_image: np.ndarray[np.uint8]) -> list[tuple[int, int, int]]:
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(bin_image, connectivity=8)
 
     bin01 = (bin_image > 0).astype(np.uint8)
     dist_map = cv2.distanceTransform(bin01, cv2.DIST_L2, 3)
@@ -183,7 +183,8 @@ def find_inner_points_for_objects(bin_image: np.ndarray[np.uint8]) -> list[tuple
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(masked_dist)
         # maxLoc jest (x, y) => (kolumna, wiersz)
         r, c = min(max(maxLoc[1], 5), bin_image.shape[0] - 5), min(max(maxLoc[0], 5), bin_image.shape[1] - 5)
-        points.append((r, c))
+        area = stats[label_idx, cv2.CC_STAT_AREA]
+        points.append((r, c, area))
 
     return points
 
