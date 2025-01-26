@@ -3,6 +3,8 @@
 
 Ensure that your python is at least version 3.10
 
+Example images can be found in ``backend/example_images`` directory
+
 ```sh
 cd backend
 python -m venv venv

@@ -23,7 +23,7 @@ const items = [
         icon: Images,
       },
     {
-      title: "Informacje",
+      title: "Info",
       url: "/info",
       icon: Info,
     },
