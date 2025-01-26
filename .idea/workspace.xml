@@ -5,12 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16e305a9-68c5-449f-915a-efdd463a86c3" name="Changes" comment="changes">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/entrypoint.sh" beforeDir="false" afterPath="$PROJECT_DIR$/backend/entrypoint.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/color_segmentation/clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/color_segmentation/clustering.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/backend/_Dockerfile.dev" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/frontend/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/entrypoint.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/dist/assets/index-B_XUzDnE.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/dist/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dist/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +87,7 @@
     "Python.test2.executor": "Run",
     "Python.test3.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "static-front-build",
+    "git-widget-placeholder": "select-options",
     "last_opened_file_path": "/home/andrzej/Documents/AO-Final-Project/frontend/public",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -91,7 +96,7 @@
     "nodejs_package_manager_path": "npm",
     "npm.dev.executor": "Run",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "ts.external.directory.path": "/home/marcin/Documents/AO-Final-Project/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/marcin/Documents/AO/AO-Final-Project/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -104,7 +109,7 @@
       <recent name="$PROJECT_DIR$/backend" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="All services" type="CompoundRunConfigurationType">
       <toRun name="dev" type="js.build_tools.npm" />
       <toRun name="app" type="PythonConfigurationType" />
@@ -253,11 +258,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build" />
-        <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_clustering" />
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development_case_2" />
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development" />
+        <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_clustering" />
         <item itemvalue="Python tests.Python tests in /home/andrzej/Documents/AO-Final-Project/backend/test/test_image_color_segmentation.py" />
+        <item itemvalue="npm.build" />
       </list>
     </recent_temporary>
   </component>
@@ -427,7 +432,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="main" />
+                        <option value="select-options" />
                       </list>
                     </value>
                   </entry>

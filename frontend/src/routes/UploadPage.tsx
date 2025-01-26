@@ -194,14 +194,13 @@ export const UploadPage = () => {
                       <SelectTrigger className="w-[280px]">
                         <SelectValue
                             placeholder="Select number of colors"
-                            // value={colorCount}
                         />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Color count</SelectLabel>
                           {
-                            [2, 3, 4, 5, 6, 8, 10, 12, 16, 24, 32].map(num=>
+                            [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32].map(num=>
                                 <SelectItem key={num} value={`${num}`}>{num}</SelectItem>
                             )
                           }
