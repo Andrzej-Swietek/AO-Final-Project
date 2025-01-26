@@ -3,8 +3,6 @@ from dataclasses import dataclass
 import cv2
 import cv2 as cv
 import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 
 
 @dataclass
@@ -78,62 +76,6 @@ def find_optimal_k(
     return best_k
 
 
-def find_optimal_k2(
-    image: np.ndarray[np.uint8],
-    k_min: int = 3,
-    k_max: int = 10,
-    sample_size: int = 5000
-) -> int:
-    """
-    Wybiera optymalną liczbę klastrów k dla danego obrazu
-    na podstawie Silhouette Score (scikit-learn).
-
-    Parametry:
-    -----------
-    - image: Obraz w formacie np.uint8 (H, W, 3).
-    - k_min, k_max: Zakres poszukiwań k.
-    - sample_size: Dla przyspieszenia liczeń pobieramy losową próbkę pikseli.
-                   Jeśli obraz jest niewielki, można ustawić na None i wziąć całość.
-
-    Zwraca:
-    --------
-    - best_k: optymalna liczba klastrów według Silhouette Score.
-    """
-
-    # Przekształcamy obraz do postaci (N, 3)
-    pixels = image.reshape((-1, 3))
-
-    # Dla dużych obrazów obliczenia silhouette mogą być kosztowne
-    # - weźmy więc losową próbkę pikseli, aby przyspieszyć.
-    if sample_size is not None and sample_size < len(pixels):
-        idx = np.random.choice(len(pixels), size=sample_size, replace=False)
-        sample_pixels = pixels[idx]
-    else:
-        sample_pixels = pixels
-
-    # Konwertuj na float (scikit-learn KMeans i tak sam zamieni na float64,
-    # ale zachowujemy spójność z podejściem w OpenCV).
-    sample_pixels = sample_pixels.astype(np.float32)
-
-    best_k = k_min
-    best_score = -1  # Silhouette score może być w [-1, 1]
-
-    for k in range(k_min, k_max + 1):
-        # Używamy scikit-learn KMeans do szybkiego obliczenia "labels" i silhouette
-        # (liczba prób n_init -> analogia do "attempts" w OpenCV).
-        kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
-        labels = kmeans.fit_predict(sample_pixels)
-
-        # Obliczamy silhouette score
-        score = silhouette_score(sample_pixels, labels)
-
-        # Szukamy maksymalnego silhouette
-        if score > best_score:
-            best_score = score
-            best_k = k
-
-    return best_k
-
 def kmeans_image_segmentation(image: np.ndarray[np.uint8], k: int) -> KMeansResult:
 
     pixels = image.reshape((-1, 3))
@@ -171,6 +113,7 @@ def remove_distortions(binary_image: np.ndarray[np.uint8], power: int = 5) -> np
     result = cv2.dilate(result, np.ones((power, power), np.uint8), iterations=1)
     return result
 
+
 def get_edges(mask: np.ndarray):
     return cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1) - mask # cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
 
@@ -199,7 +142,6 @@ def shrink_to_points(binary_image: np.ndarray[np.uint8]) -> np.ndarray[np.uint8]
     return prev
 
 
-
 def combine_rgb_images(images: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
 
     combined = np.zeros_like(images[0], dtype=np.uint16)  # Use uint16 to avoid overflow during addition
@@ -216,6 +158,7 @@ def sharpen_image(image: np.ndarray[np.uint8], k: int = 3) -> np.ndarray[np.uint
     # filter_matrix = make_filter_matrix(k)
     # filtered_image = cv2.filter2D(src=image, ddepth=-1, kernel=filter_matrix)
     return sharpened_image
+
 
 def make_filter_matrix(k: int) -> np.ndarray[np.float32]:
     if k % 2 == 0:
@@ -243,6 +186,7 @@ def find_inner_points_for_objects(bin_image: np.ndarray[np.uint8]) -> list[tuple
         points.append((r, c))
 
     return points
+
 
 def scale_image(og_image: np.ndarray, size: int = 512) -> np.ndarray:
     original_height, original_width = og_image.shape[:2]
