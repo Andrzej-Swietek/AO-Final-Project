@@ -157,6 +157,7 @@ def download_filled_image(task_id):
 
 
 @app.route("/api/task_status_stream/<task_id>", methods=["GET"])
+@cross_origin()
 def task_status_stream(task_id):
     def generate():
         while True:

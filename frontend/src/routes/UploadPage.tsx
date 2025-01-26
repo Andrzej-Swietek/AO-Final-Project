@@ -19,7 +19,8 @@ export const UploadPage = () => {
   const [colorCount, setColorCount] = useState<number>(3);
   const { toast } = useToast()
 
-  const PUBLIC_API_URL = "http://localhost:5000";
+  // const PUBLIC_API_URL = "http://localhost:5000";
+  const PUBLIC_API_URL =  import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
