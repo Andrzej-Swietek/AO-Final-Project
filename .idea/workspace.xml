@@ -5,13 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16e305a9-68c5-449f-915a-efdd463a86c3" name="Changes" comment="changes">
-      <change afterPath="$PROJECT_DIR$/frontend/public/team.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/color_segmentation/color_segmentation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/backend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/routes/AboutPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/AboutPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/worker/image_worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/worker/image_worker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/UploadPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,7 +79,7 @@
     "Python.test2.executor": "Run",
     "Python.test3.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "improve-dev-experience",
+    "git-widget-placeholder": "colors-select",
     "last_opened_file_path": "/home/andrzej/Documents/AO-Final-Project/frontend/public",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -90,7 +88,7 @@
     "nodejs_package_manager_path": "npm",
     "npm.dev.executor": "Run",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "ts.external.directory.path": "/home/andrzej/Documents/AO-Final-Project/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/marcin/Documents/AO-Final-Project/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -103,7 +101,7 @@
       <recent name="$PROJECT_DIR$/backend" />
     </key>
   </component>
-  <component name="RunManager" selected="Compound.All services">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="All services" type="CompoundRunConfigurationType">
       <toRun name="dev" type="js.build_tools.npm" />
       <toRun name="app" type="PythonConfigurationType" />
@@ -124,29 +122,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/app.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="clustering" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="grafika-project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend/color_segmentation" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/color_segmentation/clustering.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -257,7 +232,6 @@
       <item itemvalue="npm.dev" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.app" />
-      <item itemvalue="Python.clustering" />
       <item itemvalue="Python tests.Python tests in /home/andrzej/Documents/AO-Final-Project/backend/test/test_image_color_segmentation.py" />
       <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_clustering" />
       <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development" />
@@ -269,7 +243,6 @@
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development_case_2" />
         <item itemvalue="Python tests.Python tests for test_image_color_segmentation.TestImageColorSegmentation.test_development" />
         <item itemvalue="Python tests.Python tests in /home/andrzej/Documents/AO-Final-Project/backend/test/test_image_color_segmentation.py" />
-        <item itemvalue="Python.clustering" />
       </list>
     </recent_temporary>
   </component>
@@ -458,16 +431,6 @@
     <MESSAGE value="changes" />
     <MESSAGE value="Changes" />
     <option name="LAST_COMMIT_MESSAGE" value="Changes" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/color_segmentation/concurrent_color_segmentation.py</url>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/grafika_project$.coverage" NAME=" Coverage Results" MODIFIED="1737841971336" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/tests" />

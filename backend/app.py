@@ -49,7 +49,9 @@ def hello():
 def process_image():
     try:
         content_image = request.files['image']
-        difficulty = request.form.get('difficulty', 50)
+        # difficulty = request.form.get('difficulty', 50)
+        color_count = request.form.get('color_count', 3)
+        logger.info(color_count)
         logger.info(content_image)
         if not content_image:
             return jsonify({'error': 'Image is required'}), 400
@@ -66,7 +68,7 @@ def process_image():
         redis_client.set(task_id, 'In Progress') 
         # job = queue.enqueue(process_image_in_background, content_image, difficulty, task_id)
         logger.info(f"Task {task_id} started.")
-        process_image_in_background(image_path, difficulty, task_id, logger, redis_client)
+        process_image_in_background(image_path, color_count, task_id, logger, redis_client)
 
         return jsonify({"status": "processing", "task_id": task_id})
     except Exception as e:

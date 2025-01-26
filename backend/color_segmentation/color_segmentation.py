@@ -14,13 +14,12 @@ class ImageColorSegmentation:
     OUTPUT_FOLDER: str = "./output"
     scale = 255 / 360
 
-
-    def __init__(self, task_id: str):
+    def __init__(self, task_id: str, color_count: int = 4):
         self.images = []
         self.color_masks = []
         self.image = None
         self.task_id = task_id
-
+        self.color_count = color_count
 
     def load_image(self, image_path: str) -> None:
         self.image = cv2.imread(image_path)
@@ -28,7 +27,7 @@ class ImageColorSegmentation:
         self.image = cv2.bilateralFilter(self.image, 9, 125, 125)
 
     def process_image(self):
-        clustering_result = kmeans_image_segmentation(self.image, 6)
+        clustering_result = kmeans_image_segmentation(self.image, int(self.color_count))
         raw_masks = get_color_masks(clustering_result)
         contours = []
         colored_masks = []
@@ -71,7 +70,6 @@ class ImageColorSegmentation:
                 cv2.circle(kolorowanka, (c, r), radius=5, color=(int(color[0]), int(color[1]), int(color[2])), thickness=-1)
 
         self.save_image("result.jpg", kolorowanka)
-
 
     def save_image(self, name: str, image) -> None:
         output_path = os.path.join(self.OUTPUT_FOLDER, self.task_id, name)
