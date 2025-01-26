@@ -12,3 +12,5 @@ source ./venv/bin/activate
 pip install --upgrade pip && pip install -r requirements.txt
 flask run --host=0.0.0.0
 ```
+
+The application will start listening at port 5000. Open your browser and type `http://localhost:5000` to enter.
