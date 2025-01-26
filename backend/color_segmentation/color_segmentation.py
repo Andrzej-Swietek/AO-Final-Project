@@ -42,7 +42,6 @@ class ImageColorSegmentation:
             colored_mask[(colored_mask[:, :, 1] == 255)] = clustering_result.centers[i]
             colored_masks.append(colored_mask)
 
-            # 2. Znajdź punkt w każdym obiekcie
             object_points = find_inner_points_for_objects(mask)
             all_points.append(object_points)
 

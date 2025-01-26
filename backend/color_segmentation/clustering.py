@@ -7,9 +7,9 @@ import numpy as np
 
 @dataclass
 class KMeansResult:
-    segmented_image: np.ndarray[np.uint8]  # shape (H, W, 3)
-    labels: np.ndarray[np.int32]  # shape (H*W,)
-    centers: np.ndarray[np.uint8]  # shape (K, 3)
+    segmented_image: np.ndarray[np.uint8]
+    labels: np.ndarray[np.int32]
+    centers: np.ndarray[np.uint8]
 
 
 def find_optimal_k(
@@ -17,15 +17,9 @@ def find_optimal_k(
         k_min: int = 3,
         k_max: int = 10
 ) -> int:
-    """
-    Znajduje optymalną liczbę klastrów 'k' dla obrazu
-    metodą łokcia, testując kolejne wartości w przedziale [k_min, k_max].
-    """
-    # Spłaszczamy i konwertujemy piksele na float32 (tak samo jak w kmeans_image_segmentation)
     pixels = image.reshape((-1, 3))
     pixels = np.float32(pixels)
 
-    # Kryteria k-meansa (możesz dostosować np. liczbę iteracji)
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
 
     compactness_values = []
@@ -42,34 +36,13 @@ def find_optimal_k(
         )
         compactness_values.append(compactness)
 
-    # Metoda łokcia: proste wykrywanie "załamania" w wykresie
-    # ------------------------------------------------------
-    # 1) Możemy znaleźć punkt, dla którego względny spadek 'compactness'
-    #    między k i k+1 jest najmniejszy (lub największy).
-    # 2) Możemy użyć bardziej zaawansowanej metody, np. liczenia odległości
-    #    punktu od prostej łączącej pierwszą i ostatnią wartość.
-    #
-    # Poniżej - podstawowa metoda "różnicy przyrostów":
-
-    # Liczymy różnice przyrostowe: delta(i) = compactness(i) - compactness(i+1)
-    # Potem jeszcze patrzymy jak szybko ta różnica spada.
-
-    # Przykładowe podejście: szukamy "maksimum drugiej różnicy"
-    # (czyli moment, w którym spadek inertii zaczyna gwałtownie wyhamowywać).
-
-    deltas = np.diff(compactness_values)  # różnice pomiędzy kolejnymi compactness
-    # Druga różnica (różnica różnic)
+    deltas = np.diff(compactness_values)
     second_deltas = np.diff(deltas)
 
-    # Ponieważ second_deltas jest krótsze o 1 niż deltas,
-    # bierzemy indeks, który powoduje największą dodatnią "drugą różnicę".
-    # Indeks w second_deltas odnosi się do k_values[i + 1].
     if len(second_deltas) > 0:
         best_idx = np.argmax(second_deltas)
         best_k = k_values[best_idx + 1]
     else:
-        # Jeśli z jakichś powodów nie da się policzyć (np. k_min == k_max),
-        # to weźmy minimalną wartość compactness
         best_idx = np.argmin(compactness_values)
         best_k = k_values[best_idx]
 
@@ -115,7 +88,7 @@ def remove_distortions(binary_image: np.ndarray[np.uint8], power: int = 5) -> np
 
 
 def get_edges(mask: np.ndarray):
-    return cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1) - mask # cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
+    return cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1) - mask
 
 
 def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
@@ -144,11 +117,11 @@ def shrink_to_points(binary_image: np.ndarray[np.uint8]) -> np.ndarray[np.uint8]
 
 def combine_rgb_images(images: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
 
-    combined = np.zeros_like(images[0], dtype=np.uint16)  # Use uint16 to avoid overflow during addition
+    combined = np.zeros_like(images[0], dtype=np.uint16)
     for image in images:
-        combined += image  # Add pixel values
+        combined += image
 
-    combined = np.clip(combined, 0, 255).astype(np.uint8)  # Clip values to 0-255 and convert back to uint8
+    combined = np.clip(combined, 0, 255).astype(np.uint8)
     return combined
 
 
@@ -179,9 +152,8 @@ def find_inner_points_for_objects(bin_image: np.ndarray[np.uint8]) -> list[tuple
     for label_idx in range(1, num_labels):
         masked_dist = dist_map.copy()
         masked_dist[labels != label_idx] = 0
-        # Znajdź maksimum w "masked_dist"
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(masked_dist)
-        # maxLoc jest (x, y) => (kolumna, wiersz)
+
         r, c = min(max(maxLoc[1], 5), bin_image.shape[0] - 5), min(max(maxLoc[0], 5), bin_image.shape[1] - 5)
         area = stats[label_idx, cv2.CC_STAT_AREA]
         points.append((r, c, area))
