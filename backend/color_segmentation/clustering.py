@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from typing import Any
 
 import cv2
-import numpy as np
 import cv2 as cv
-import os
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
 
 @dataclass
 class KMeansResult:
@@ -12,6 +13,126 @@ class KMeansResult:
     labels: np.ndarray[np.int32]  # shape (H*W,)
     centers: np.ndarray[np.uint8]  # shape (K, 3)
 
+
+def find_optimal_k(
+        image: np.ndarray[np.uint8],
+        k_min: int = 3,
+        k_max: int = 10
+) -> int:
+    """
+    Znajduje optymalną liczbę klastrów 'k' dla obrazu
+    metodą łokcia, testując kolejne wartości w przedziale [k_min, k_max].
+    """
+    # Spłaszczamy i konwertujemy piksele na float32 (tak samo jak w kmeans_image_segmentation)
+    pixels = image.reshape((-1, 3))
+    pixels = np.float32(pixels)
+
+    # Kryteria k-meansa (możesz dostosować np. liczbę iteracji)
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+
+    compactness_values = []
+    k_values = list(range(k_min, k_max + 1))
+
+    for k in k_values:
+        compactness, _, _ = cv.kmeans(
+            data=pixels,
+            K=k,
+            bestLabels=None,
+            criteria=criteria,
+            attempts=10,
+            flags=cv.KMEANS_RANDOM_CENTERS
+        )
+        compactness_values.append(compactness)
+
+    # Metoda łokcia: proste wykrywanie "załamania" w wykresie
+    # ------------------------------------------------------
+    # 1) Możemy znaleźć punkt, dla którego względny spadek 'compactness'
+    #    między k i k+1 jest najmniejszy (lub największy).
+    # 2) Możemy użyć bardziej zaawansowanej metody, np. liczenia odległości
+    #    punktu od prostej łączącej pierwszą i ostatnią wartość.
+    #
+    # Poniżej - podstawowa metoda "różnicy przyrostów":
+
+    # Liczymy różnice przyrostowe: delta(i) = compactness(i) - compactness(i+1)
+    # Potem jeszcze patrzymy jak szybko ta różnica spada.
+
+    # Przykładowe podejście: szukamy "maksimum drugiej różnicy"
+    # (czyli moment, w którym spadek inertii zaczyna gwałtownie wyhamowywać).
+
+    deltas = np.diff(compactness_values)  # różnice pomiędzy kolejnymi compactness
+    # Druga różnica (różnica różnic)
+    second_deltas = np.diff(deltas)
+
+    # Ponieważ second_deltas jest krótsze o 1 niż deltas,
+    # bierzemy indeks, który powoduje największą dodatnią "drugą różnicę".
+    # Indeks w second_deltas odnosi się do k_values[i + 1].
+    if len(second_deltas) > 0:
+        best_idx = np.argmax(second_deltas)
+        best_k = k_values[best_idx + 1]
+    else:
+        # Jeśli z jakichś powodów nie da się policzyć (np. k_min == k_max),
+        # to weźmy minimalną wartość compactness
+        best_idx = np.argmin(compactness_values)
+        best_k = k_values[best_idx]
+
+    return best_k
+
+
+def find_optimal_k2(
+    image: np.ndarray[np.uint8],
+    k_min: int = 3,
+    k_max: int = 10,
+    sample_size: int = 5000
+) -> int:
+    """
+    Wybiera optymalną liczbę klastrów k dla danego obrazu
+    na podstawie Silhouette Score (scikit-learn).
+
+    Parametry:
+    -----------
+    - image: Obraz w formacie np.uint8 (H, W, 3).
+    - k_min, k_max: Zakres poszukiwań k.
+    - sample_size: Dla przyspieszenia liczeń pobieramy losową próbkę pikseli.
+                   Jeśli obraz jest niewielki, można ustawić na None i wziąć całość.
+
+    Zwraca:
+    --------
+    - best_k: optymalna liczba klastrów według Silhouette Score.
+    """
+
+    # Przekształcamy obraz do postaci (N, 3)
+    pixels = image.reshape((-1, 3))
+
+    # Dla dużych obrazów obliczenia silhouette mogą być kosztowne
+    # - weźmy więc losową próbkę pikseli, aby przyspieszyć.
+    if sample_size is not None and sample_size < len(pixels):
+        idx = np.random.choice(len(pixels), size=sample_size, replace=False)
+        sample_pixels = pixels[idx]
+    else:
+        sample_pixels = pixels
+
+    # Konwertuj na float (scikit-learn KMeans i tak sam zamieni na float64,
+    # ale zachowujemy spójność z podejściem w OpenCV).
+    sample_pixels = sample_pixels.astype(np.float32)
+
+    best_k = k_min
+    best_score = -1  # Silhouette score może być w [-1, 1]
+
+    for k in range(k_min, k_max + 1):
+        # Używamy scikit-learn KMeans do szybkiego obliczenia "labels" i silhouette
+        # (liczba prób n_init -> analogia do "attempts" w OpenCV).
+        kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
+        labels = kmeans.fit_predict(sample_pixels)
+
+        # Obliczamy silhouette score
+        score = silhouette_score(sample_pixels, labels)
+
+        # Szukamy maksymalnego silhouette
+        if score > best_score:
+            best_score = score
+            best_k = k
+
+    return best_k
 
 def kmeans_image_segmentation(image: np.ndarray[np.uint8], k: int) -> KMeansResult:
 

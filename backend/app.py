@@ -1,28 +1,75 @@
-from flask import Flask, send_from_directory, jsonify, request, Response, send_file
-from flask_cors import CORS, cross_origin
-from uuid import uuid4
-import redis
+import json
+import logging
 import os
 import sys
-import json
 import time
-import logging
-from rq import Queue
+from uuid import uuid4
 
-from backend.utils import send_file_with_attachment, encode_image
+from flask import send_from_directory, Response, send_file
+from flask_cors import CORS, cross_origin
+
+from backend.utils import send_file_with_attachment
 from backend.worker.image_worker import process_image_in_background
+
+import sqlite3
+from flask import Flask, request, jsonify
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+DB_FILE = "map_storage.db"
+
+
+def init_db():
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS map (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        """)
+        conn.commit()
+
+
+# Funkcje pomocnicze do obsługi bazy danych
+def set_task_status(key: str, value: str):
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("REPLACE INTO map (key, value) VALUES (?, ?)", (key, value))
+        conn.commit()
+
+
+def get_task_status(key: str):
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM map WHERE key = ?", (key,))
+        row = cursor.fetchone()
+        return row[0] if row else None
+
+
+def delete_task_status(key: str):
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM map WHERE key = ?", (key,))
+        conn.commit()
+
+
+def get_all_statuses():
+    with sqlite3.connect(DB_FILE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT key, value FROM map")
+        return dict(cursor.fetchall())
+
+
+init_db()
 app = Flask(__name__, static_folder="../frontend/dist")
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000  # 16MB
 CORS(app)
 OUTPUT_FOLDER = "./output/"
 
-# Set up redis
-redisHost = os.getenv("REDIS_HOST", "127.0.0.1")
-redis_client = redis.Redis(host=redisHost, port=6379, db=0)
-queue = Queue(connection=redis_client)
+IN_PROGRESS: str = "In Progress"
+FINISHED: str = "Finished"
+FAILED: str = "Failed"
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -60,19 +107,16 @@ def process_image():
         if not content_image:
             return jsonify({'error': 'Image is required'}), 400
 
-        task_id = str(uuid4())  
+        task_id = str(uuid4())
 
         task_folder = os.path.join(OUTPUT_FOLDER, task_id)
         os.makedirs(task_folder, exist_ok=True)
 
         image_path = os.path.join(task_folder, content_image.filename)
         content_image.save(image_path)
-        if not redis_client:
-            return jsonify({ "status": "no redis" }),500
-        redis_client.set(task_id, 'In Progress') 
-        # job = queue.enqueue(process_image_in_background, content_image, difficulty, task_id)
+        set_task_status(task_id, IN_PROGRESS)
         logger.info(f"Task {task_id} started.")
-        process_image_in_background(image_path, color_count, task_id, logger, redis_client)
+        process_image_in_background(image_path, color_count, task_id, logger)
 
         return jsonify({"status": "processing", "task_id": task_id})
     except Exception as e:
@@ -83,21 +127,20 @@ def process_image():
 @app.route('/api/task_status/<task_id>', methods=['GET'])
 @cross_origin()
 def task_status(task_id):
-    status = redis_client.get(task_id)
+    status = get_task_status(task_id)
     if status is None:
         return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
-    return jsonify({'task_id': task_id, 'status': status.decode('utf-8')})
+    return jsonify({'task_id': task_id, 'status': str(status)})
 
 
 @app.route('/api/download/<task_id>', methods=['GET'])
 @cross_origin()
 def download(task_id):
-    task = redis_client.get(task_id)
-    task_status_str = task.decode('utf-8')
-    if task is None:
+    status = get_task_status(task_id)
+    if status is None:
         return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
 
-    if task_status_str in ['Finished', 'Completed']:
+    if status == FINISHED:
         output_path = f"./output/{task_id}/result.jpg"
         if os.path.exists(output_path):
             return send_file_with_attachment(output_path, 'result.jpg')
@@ -107,15 +150,14 @@ def download(task_id):
                 'status': 'Output file not found'
             }), 404
     else:
-        return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
+        return jsonify({'task_id': task_id, 'status': f'In Progress: [{status}]'}), 404
+
 
 @app.route('/api/view/<task_id>', methods=['GET'])
 @cross_origin()
 def view_image(task_id):
-    task = redis_client.get(task_id)
-    task_status_str = task.decode('utf-8') if task else None
-
-    if task is None or task_status_str not in ['Finished', 'Completed']:
+    status = get_task_status(task_id)
+    if status is None or status != FINISHED:
         return jsonify({'task_id': task_id, 'status': 'Image not available'}), 404
 
     output_path = f"./output/{task_id}/result.jpg"
@@ -124,13 +166,13 @@ def view_image(task_id):
     else:
         return jsonify({'task_id': task_id, 'status': 'Image file not found'}), 404
 
+
 @app.route('/api/view/<task_id>/final-image', methods=['GET'])
 @cross_origin()
 def view_final_image(task_id):
-    task = redis_client.get(task_id)
-    task_status_str = task.decode('utf-8') if task else None
+    status = get_task_status(task_id)
 
-    if task is None or task_status_str not in ['Finished', 'Completed']:
+    if status is None or status != FINISHED:
         return jsonify({'task_id': task_id, 'status': 'Image not available'}), 404
 
     output_path = f"./output/{task_id}/final_image.bmp"
@@ -139,15 +181,15 @@ def view_final_image(task_id):
     else:
         return jsonify({'task_id': task_id, 'status': 'Image file not found'}), 404
 
+
 @app.route('/api/filled-image/<task_id>', methods=['GET'])
 @cross_origin()
 def download_filled_image(task_id):
-    task = redis_client.get(task_id)
-    task_status_str = task.decode('utf-8')
-    if task is None:
+    status = get_task_status(task_id)
+    if status is None:
         return jsonify({'task_id': task_id, 'status': 'Unknown'}), 404
 
-    if task_status_str in ['Finished', 'Completed']:
+    if status != FINISHED:
         output_path = f"./output/{task_id}/final_image.jpg"
         if os.path.exists(output_path):
             return send_file_with_attachment(output_path, 'result.jpg')
@@ -157,7 +199,7 @@ def download_filled_image(task_id):
                 'status': 'Output file not found'
             }), 404
     else:
-        return jsonify({'task_id': task_id, 'status': f'In Progress: [{task_status_str}]'}), 404
+        return jsonify({'task_id': task_id, 'status': f'In Progress: [{status}]'}), 404
 
 
 @app.route("/api/task_status_stream/<task_id>", methods=["GET"])
@@ -165,13 +207,12 @@ def download_filled_image(task_id):
 def task_status_stream(task_id):
     def generate():
         while True:
-            status = redis_client.get(task_id)
+            status = get_task_status(task_id)
             if status is None:
                 yield f"data: {json.dumps({'status': 'Unknown'})}\n\n"
                 break
-            status = status.decode('utf-8')
             yield f"data: {json.dumps({'status': status})}\n\n"
-            
+
             if status in ['Finished', 'Failed']:
                 break
 

@@ -5,7 +5,7 @@ import cv2
 
 from backend.color_segmentation.clustering import kmeans_image_segmentation, get_color_masks, remove_distortions, \
     get_edges, combine_edges, combine_rgb_images, find_inner_points_for_objects, \
-    scale_image
+    scale_image, find_optimal_k, find_optimal_k2
 from backend.color_segmentation.color_segmentation import ImageColorSegmentation
 
 
@@ -30,13 +30,13 @@ class TestImageColorSegmentation(unittest.TestCase):
                 os.remove(file_path)  # Remove the file
                 print(f"Deleted: {file_path}")
 
-        og_image = cv2.imread("../example_images/img_6.png")
+        og_image = cv2.imread("../example_images/img_4.png")
         og_image = scale_image(og_image)
         cv2.imwrite("original.bmp", og_image)
         og_image = cv2.bilateralFilter(og_image, 9, 125, 125)
         cv2.imwrite("original_filtered.bmp", og_image)
         # og_image = cv2.cvtColor(og_image, cv2.COLOR_RGB2LAB)
-        clustering_result = kmeans_image_segmentation(og_image, 8)
+        clustering_result = kmeans_image_segmentation(og_image, find_optimal_k2(og_image))
         # clustering_result.segmented_image = cv2.cvtColor(clustering_result.segmented_image, cv2.COLOR_LAB2RGB)
         # print(clustering_result.centers)
         # clustering_result.centers = cv2.cvtColor(clustering_result.centers[np.newaxis, :, :], cv2.COLOR_LAB2RGB)[0]
