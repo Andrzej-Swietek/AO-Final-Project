@@ -1,20 +1,15 @@
 # AO-Final-Project
-## Docker
+## How to run the app
 
 ```sh
 docker compose up --build -d
 ```
 
-## Locally
-### Runb Frontend
-```sh
-cd frontend
-npm i
-npm run dev
-```
+Wait for the container to start
 
-### Run Backned
 ```sh
 cd backend
-pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+python -m venv venv
+source venv/bin/activate
+./entrypoint.sh
 ```
