@@ -51,7 +51,7 @@ def remove_distortions(binary_image: np.ndarray[np.uint8], power: int = 5) -> np
     return result
 
 def get_edges(mask: np.ndarray):
-    return cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1) - cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
+    return cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1) - mask # cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=1)
 
 
 def combine_edges(edges: list[np.ndarray[np.uint8]]) -> np.ndarray[np.uint8]:
